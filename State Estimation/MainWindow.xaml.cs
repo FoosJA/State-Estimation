@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using ASTRALib;
 using State_Estimation.Model;
 using System.Collections.ObjectModel;
+using TypeOi = State_Estimation.Model.OperInform.KeyType;
 
 namespace State_Estimation
 {
@@ -57,29 +58,28 @@ namespace State_Estimation
 							foreach(var node in viewModel.NodeList)
 							{
 								if (node.P != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas=DateTime.Now, Name ="-",Id = node.Numb, Type = "P", Meas = node.P });
+									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas=DateTime.Now, Name ="-",Id = node.Numb, Type = TypeOi.P, Meas = node.P });
 								if (node.Q != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = "Q", Meas = node.Q });
+									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.Q, Meas = node.Q });
 								if (node.U != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = "U", Meas = node.U });
+									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.U, Meas = node.U });
 								if (node.Delta != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = "Delta", Meas = node.Delta });
+									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.Delta, Meas = node.Delta });
 							}
 							foreach(var branch in viewModel.BranchList)
 							{
-
 								if (branch.Pi != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = "Pij", Meas = branch.Pi });
+									oiList.Add(new OperInform { NodeNumb = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Pij, Meas = branch.Pi });
 								if (branch.Pj != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj,TimeMeas=DateTime.Now, Name = "-", Id = branch.Nj, Type = "Pij", Meas = branch.Pj });
+									oiList.Add(new OperInform { NodeNumb = branch.Nj,TimeMeas=DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Pij, Meas = branch.Pj });
 								if (branch.Qi != 0)									 
-									oiList.Add(new OperInform { NodeNumb = branch.Ni,TimeMeas=DateTime.Now, Name = "-", Id = branch.Ni, Type = "Qij", Meas = branch.Qi });
+									oiList.Add(new OperInform { NodeNumb = branch.Ni,TimeMeas=DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Qij, Meas = branch.Qi });
 								if (branch.Qj != 0)																  
-									oiList.Add(new OperInform { NodeNumb = branch.Nj,TimeMeas=DateTime.Now, Name = "-", Id = branch.Nj, Type = "Qij", Meas = branch.Qj });
+									oiList.Add(new OperInform { NodeNumb = branch.Nj,TimeMeas=DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Qij, Meas = branch.Qj });
 								if (branch.Ii != 0)									
-									oiList.Add(new OperInform { NodeNumb = branch.Ni,TimeMeas=DateTime.Now, Name = "-", Id = branch.Ni, Type = "Iij", Meas = branch.Ii });
+									oiList.Add(new OperInform { NodeNumb = branch.Ni,TimeMeas=DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Iij, Meas = branch.Ii });
 								if (branch.Ij != 0)									
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = "Iij", Meas = branch.Ij });
+									oiList.Add(new OperInform { NodeNumb = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Iij, Meas = branch.Ij });
 							}
 							viewModel.OiList = oiList;
 						}
@@ -132,7 +132,8 @@ namespace State_Estimation
 				};
 				if (node.P == 0 && node.Q == 0)
 					node.TypeIndex = 5;
-				node.Type = node.keyType[node.TypeIndex];
+				node.Type =(TypeNode) node.TypeIndex;
+				string test = node.Type.ToDescriptionString();
 				NodeList.Add(node);
 			}
 
@@ -163,7 +164,7 @@ namespace State_Estimation
 				else
 					branch.Sta = true;
 				branch.Numb = NumbVetv;
-				branch.Type = branch.keyType[tipVetv.get_ZN(NumbVetv)];
+				branch.Type =(TypeBranch) tipVetv.get_ZN(NumbVetv);
 				branch.Ni = niVetv.get_ZN(NumbVetv);
 				branch.Nj = njVetv.get_ZN(NumbVetv);
 				branch.Paral = paralVetv.get_ZN(NumbVetv);

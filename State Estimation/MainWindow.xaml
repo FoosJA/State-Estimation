@@ -29,9 +29,9 @@
             <Separator/>
             <Button x:Name="BtnSave" Content=" Сохранить " Command="{Binding }"  />
             <Separator/>
-            <Button x:Name="BtnStaticSE" Content=" Статическое ОС " Command="{Binding }"  />
+            <Button x:Name="BtnStaticSE" Content=" Статическое ОС " Command="{Binding SSECommand}"  />
             <Separator/>
-            <Button x:Name="BtnDinamicSE" Content=" Динамическое ОС " Command="{Binding }" />
+            <Button x:Name="BtnDinamicSE" Content=" Динамическое ОС " Command="{Binding DSECommand}" />
             <Separator/>
         </ToolBar>
         <TabControl Grid.Row="2">
@@ -48,7 +48,7 @@
                               SelectedItem="{Binding Path=SelectedNode,UpdateSourceTrigger=PropertyChanged}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Path = Numb}" Header="№"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Type}" Header="Тип"  Width="*" />
+                            <DataGridTextColumn Binding="{Binding Path = TypeStr}" Header="Тип"  Width="*" IsReadOnly="True" />
                             <DataGridTextColumn Binding="{Binding Path = Name}" Header="Название"  Width="2*" />
                             <DataGridTextColumn Binding="{Binding Path = Unom}" Header="Uном"  Width="*" />
                             <DataGridTextColumn Binding="{Binding Path = B}" Header="Bш"  Width="*" />
@@ -83,7 +83,7 @@
                               SelectedItem="{Binding Path=SelectedBranch,UpdateSourceTrigger=PropertyChanged}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Path = Numb}" Header="№"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Type}" Header="Тип"  Width="*" />
+                            <DataGridTextColumn Binding="{Binding Path = TypeStr}" Header="Тип"  Width="*" IsReadOnly="True"/>
                             <DataGridTextColumn Binding="{Binding Path = Ni}" Header="Nнач"  Width="*" />
                             <DataGridTextColumn Binding="{Binding Path = Nj}" Header="Nкон"  Width="*" />
                             <DataGridTextColumn Binding="{Binding Path = Name}" Header="Название"  Width="2*" />

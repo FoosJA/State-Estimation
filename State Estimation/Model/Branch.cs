@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,8 @@ namespace State_Estimation.Model
 	{
 		public bool Sta { get; set; }
 		public int Numb { get; set; }
-		public string Type { get; set; }
+		public string TypeStr { get { return Type.ToDescriptionString(); } }
+		public TypeBranch Type { get; set; }
 		public int Ni { get; set; }
 		public int Nj { get; set; }
 		public int Paral { get; set; }
@@ -29,12 +31,14 @@ namespace State_Estimation.Model
 		public double Ij { get; set; }
 		public double Dj { get; set; }
 
-		public Dictionary<int, string> keyType = new Dictionary<int, string>//if(ktr) 1:(if(r=0&x=0) 2:0)
-		{
-			[0] = "ЛЭП",
-			[1] = "Тр-р",
-			[2] = "Выкл"
-		};
+		
 		
 	}
+	public enum TypeBranch
+	{
+		[Description("ЛЭП")] Line = 0,
+		[Description("Тр-р")] Trans = 1,
+		[Description("Выкл")] Breaker = 2
+	}
+
 }

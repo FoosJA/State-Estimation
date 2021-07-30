@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="AppView.cs" />
     <Compile Include="AppViewModel.cs" />
+    <Compile Include="Foundation\Matrix.cs" />
     <Compile Include="Foundation\RelayCommand.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
