@@ -104,6 +104,8 @@ namespace State_Estimation
 								double J_Vi = 0;
 								double J_Deltai = 0;
 								double Fi = 0;
+								Branch branch = BranchList.FirstOrDefault(x => x.Pi.Id == meas.Id || x.Pj.Id == meas.Id);
+
 								var branchesNode = BranchList.Where(x => ((x.Ni == meas.NodeNumb) || (x.Nj == meas.NodeNumb)));
 								
 								break;

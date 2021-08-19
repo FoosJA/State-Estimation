@@ -77,8 +77,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\Branch.cs" />
-    <Compile Include="Model\Node.cs" />
+    <Compile Include="Model\Network.cs" />
     <Compile Include="Model\OperInform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
