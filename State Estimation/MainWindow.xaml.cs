@@ -69,17 +69,17 @@ namespace State_Estimation
 							foreach (var branch in viewModel.BranchList)
 							{
 								if (branch.Pi.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Pij, Meas = branch.Pi.Meas });
+									oiList.Add(new OperInform { NodeNumb = branch.Ni, NodeNumb2 = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Pij, Meas = branch.Pi.Meas });
 								if (branch.Pj.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Pij, Meas = branch.Pj.Meas });
+									oiList.Add(new OperInform { NodeNumb = branch.Nj, NodeNumb2 = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Pij, Meas = branch.Pj.Meas });
 								if (branch.Qi.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Qij, Meas = branch.Qi.Meas });
+									oiList.Add(new OperInform { NodeNumb = branch.Ni, NodeNumb2 = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Qij, Meas = branch.Qi.Meas });
 								if (branch.Qj.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Qij, Meas = branch.Qj.Meas });
+									oiList.Add(new OperInform { NodeNumb = branch.Nj, NodeNumb2 = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Qij, Meas = branch.Qj.Meas });
 								if (branch.Ii.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Iij, Meas = branch.Ii.Meas });
+									oiList.Add(new OperInform { NodeNumb = branch.Ni, NodeNumb2 = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Iij, Meas = branch.Ii.Meas });
 								if (branch.Ij.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Iij, Meas = branch.Ij.Meas });
+									oiList.Add(new OperInform { NodeNumb = branch.Nj, NodeNumb2 = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Iij, Meas = branch.Ij.Meas });
 							}
 							viewModel.OiList = oiList;
 						}
@@ -172,7 +172,7 @@ namespace State_Estimation
 				branch.G = gVetv.get_ZN(NumbVetv);
 				branch.Kt = ktrVetv.get_ZN(NumbVetv);
 				if (branch.Kt == 0)
-					branch.Kt = 1;	
+					branch.Kt = 1;
 
 				if (branch.Paral != 0)
 				{
