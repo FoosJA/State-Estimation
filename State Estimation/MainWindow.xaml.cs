@@ -47,41 +47,23 @@ namespace State_Estimation
 					case ".rg2":
 						viewModel.NodeList.Clear();
 						viewModel.BranchList.Clear();
+						viewModel.AllOiList.Clear();
+						viewModel.OiList.Clear();
 						ASTRALib.IRastr Rastr = new ASTRALib.Rastr();
 						Rastr.Load(ASTRALib.RG_KOD.RG_REPL, path, "");
 						var reader = ReadRastrStruct(Rastr);
 						viewModel.NodeList = reader.Item1;
 						viewModel.BranchList = reader.Item2;
+						viewModel.AllOiList = InitializationAllOi(viewModel.NodeList, viewModel.BranchList);
+
 						if (flagReadTM)//TODO: записывать данные ТМ или нет
 						{
-							ObservableCollection<OperInform> oiList = new ObservableCollection<OperInform>();
-							foreach (var node in viewModel.NodeList)
+							ReadRastrTM(Rastr, viewModel.AllOiList);
+							foreach (var oi in viewModel.AllOiList)
 							{
-								if (node.P.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.P, Meas = node.P.Meas });
-								if (node.Q.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.Q, Meas = node.Q.Meas });
-								if (node.U.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.U, Meas = node.U.Meas });
-								if (node.Delta.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = node.Numb, TimeMeas = DateTime.Now, Name = "-", Id = node.Numb, Type = TypeOi.Delta, Meas = node.Delta.Meas });
+								if (oi.Meas != 0)//TODO: надо придумать как быть с сетевым узлом
+									viewModel.OiList.Add(oi);
 							}
-							foreach (var branch in viewModel.BranchList)
-							{
-								if (branch.Pi.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, NodeNumb2 = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Pij, Meas = branch.Pi.Meas });
-								if (branch.Pj.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, NodeNumb2 = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Pij, Meas = branch.Pj.Meas });
-								if (branch.Qi.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, NodeNumb2 = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Qij, Meas = branch.Qi.Meas });
-								if (branch.Qj.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, NodeNumb2 = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Qij, Meas = branch.Qj.Meas });
-								if (branch.Ii.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Ni, NodeNumb2 = branch.Nj, TimeMeas = DateTime.Now, Name = "-", Id = branch.Ni, Type = TypeOi.Iij, Meas = branch.Ii.Meas });
-								if (branch.Ij.Meas != 0)
-									oiList.Add(new OperInform { NodeNumb = branch.Nj, NodeNumb2 = branch.Ni, TimeMeas = DateTime.Now, Name = "-", Id = branch.Nj, Type = TypeOi.Iij, Meas = branch.Ij.Meas });
-							}
-							viewModel.OiList = oiList;
 						}
 						break;
 					default:
@@ -92,7 +74,7 @@ namespace State_Estimation
 		}
 
 		/// <summary>
-		/// Чтение файла .rg2
+		/// Чтение структуры .rg2
 		/// </summary>
 		/// <param name="rastr"></param>
 		private (ObservableCollection<Node>, ObservableCollection<Branch>) ReadRastrStruct(IRastr rastr)
@@ -197,9 +179,13 @@ namespace State_Estimation
 			return (NodeList, BranchList);
 		}
 
-		private ObservableCollection<OperInform> ReadRastrTM(IRastr rastr)
+		/// <summary>
+		/// Чтение ТМ из файла .rg2
+		/// </summary>
+		/// <param name="rastr"></param>
+		/// <param name="oiList"></param>
+		private void ReadRastrTM(IRastr rastr, ObservableCollection<OperInform> oiList)
 		{
-			ObservableCollection<OperInform> oiList = new ObservableCollection<OperInform>();
 			ASTRALib.ITable NodeRastr = rastr.Tables.Item("node");
 			ASTRALib.ICol numberBus = NodeRastr.Cols.Item("ny");
 			ASTRALib.ICol powerActiveLoad = NodeRastr.Cols.Item("pn"); //активная мощность нагрузки.
@@ -211,58 +197,21 @@ namespace State_Estimation
 
 			for (int NumbBus = 0; NumbBus < NodeRastr.Count; NumbBus++)
 			{
+				int nodeNumb = numberBus.get_ZN(NumbBus);
+
 				double P = powerActiveGen.get_ZN(NumbBus) - powerActiveLoad.get_ZN(NumbBus);
 				if (P != 0)
-					oiList.Add(new OperInform
-					{
-						Id = numberBus.get_ZN(NumbBus),
-						Type = TypeOi.P,
-						Meas = P,
-						Name = $"P узла",
-						NodeNumb = numberBus.get_ZN(NumbBus),
-						TimeMeas = DateTime.Now
-					});
-
+					oiList.First(x => x.NodeNumb == nodeNumb && x.NodeNumb2 == 0 && x.Type == TypeOi.P).Meas = P;
 				double Q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus);
 				if (Q != 0)
-					oiList.Add(new OperInform
-					{
-						Id = numberBus.get_ZN(NumbBus),
-						Type = TypeOi.Q,
-						Meas = Q,
-						Name = $"Q узла",
-						NodeNumb = numberBus.get_ZN(NumbBus),
-						TimeMeas = DateTime.Now
-					});
-
+					oiList.First(x => x.NodeNumb == nodeNumb && x.NodeNumb2 == 0 && x.Type == TypeOi.Q).Meas = Q;
 				double U = voltageBus.get_ZN(NumbBus);
-				if (U != 0)
-					oiList.Add(new OperInform
-					{
-						Id = numberBus.get_ZN(NumbBus),
-						Type = TypeOi.U,
-						Meas = U,
-						Name = $"U узла",
-						NodeNumb = numberBus.get_ZN(NumbBus),
-						TimeMeas = DateTime.Now
-					});
-
+				oiList.First(x => x.NodeNumb == nodeNumb && x.NodeNumb2 == 0 && x.Type == TypeOi.U).Meas = U;
 				double Delta = DeltaBus.get_ZN(NumbBus);
-				if (Delta != 0)
-
-					oiList.Add(new OperInform
-					{
-						Id = numberBus.get_ZN(NumbBus),
-						Type = TypeOi.Delta,
-						Meas = Delta,
-						Name = $"Delta узла",
-						NodeNumb = numberBus.get_ZN(NumbBus),
-						TimeMeas = DateTime.Now
-					});
+				oiList.First(x => x.NodeNumb == nodeNumb && x.NodeNumb2 == 0 && x.Type == TypeOi.Delta).Meas = Delta;
 			}
 
 			ASTRALib.ITable BranchRastr = rastr.Tables.Item("vetv");
-
 			ASTRALib.ICol niVetv = BranchRastr.Cols.Item("ip");
 			ASTRALib.ICol njVetv = BranchRastr.Cols.Item("iq");
 			ASTRALib.ICol paralVetv = BranchRastr.Cols.Item("np");
@@ -274,79 +223,27 @@ namespace State_Estimation
 			ASTRALib.ICol ijVetv = BranchRastr.Cols.Item("ie");
 			for (int NumbVetv = 0; NumbVetv < BranchRastr.Count; NumbVetv++)
 			{
-				double Pi = piVetv.get_ZN(NumbVetv);
-				if (Pi != 0)
-					oiList.Add(new OperInform
-					{
-						Id = niVetv.get_ZN(NumbVetv) + njVetv.get_ZN(NumbVetv),
-						NodeNumb = niVetv.get_ZN(NumbVetv),
-						NodeNumb2 = njVetv.get_ZN(NumbVetv),
-						Meas = Pi,
-						Name = "Pнач",
-						Type = TypeOi.Pij,
-						TimeMeas = DateTime.Now
-					});
-				double Qi = qiVetv.get_ZN(NumbVetv);
-				if (Qi != 0)
-					oiList.Add(new OperInform
-					{
-						Id = niVetv.get_ZN(NumbVetv) + njVetv.get_ZN(NumbVetv),
-						NodeNumb = niVetv.get_ZN(NumbVetv),
-						NodeNumb2 = njVetv.get_ZN(NumbVetv),
-						Meas = Qi,
-						Name = "Qнач",
-						Type = TypeOi.Qij,
-						TimeMeas = DateTime.Now
-					});
+				int nodeNumb1 = niVetv.get_ZN(NumbVetv);
+				int nodeNumb2 = njVetv.get_ZN(NumbVetv);
 
-				double Pj = -pjVetv.get_ZN(NumbVetv);
-				if (Pj != 0)
-					oiList.Add(new OperInform
-					{
-						Id = niVetv.get_ZN(NumbVetv) + njVetv.get_ZN(NumbVetv),
-						NodeNumb = njVetv.get_ZN(NumbVetv),
-						NodeNumb2 = niVetv.get_ZN(NumbVetv),
-						Meas = Pj,
-						Name = "Pкон",
-						Type = TypeOi.Pij,
-						TimeMeas = DateTime.Now
-					});
-				double Qj = -qjVetv.get_ZN(NumbVetv);
-				if (Qj != 0)
-					oiList.Add(new OperInform
-					{
-						Id = niVetv.get_ZN(NumbVetv) + njVetv.get_ZN(NumbVetv),
-						NodeNumb = njVetv.get_ZN(NumbVetv),
-						NodeNumb2 = niVetv.get_ZN(NumbVetv),
-						Meas = Qj,
-						Name = "Qкон",
-						Type = TypeOi.Qij,
-						TimeMeas = DateTime.Now
-					});
+				double Pi = -piVetv.get_ZN(NumbVetv);
+				oiList.First(x => x.NodeNumb == nodeNumb1 && x.NodeNumb2 == nodeNumb2 && x.Type == TypeOi.Pij).Meas = Pi;
+
+				double Qi = -qiVetv.get_ZN(NumbVetv);
+				oiList.First(x => x.NodeNumb == nodeNumb1 && x.NodeNumb2 == nodeNumb2 && x.Type == TypeOi.Qij).Meas = Qi;
+
+				double Pj = pjVetv.get_ZN(NumbVetv);
+				oiList.First(x => x.NodeNumb == nodeNumb2 && x.NodeNumb2 == nodeNumb1 && x.Type == TypeOi.Pij).Meas = Pj;
+
+				double Qj = qjVetv.get_ZN(NumbVetv);
+				oiList.First(x => x.NodeNumb == nodeNumb2 && x.NodeNumb2 == nodeNumb1 && x.Type == TypeOi.Qij).Meas = Qj;
+
 				double Ii = iiVetv.get_ZN(NumbVetv);
-				if (Ii != 0)
-					oiList.Add(new OperInform
-					{
-						Id = niVetv.get_ZN(NumbVetv) + njVetv.get_ZN(NumbVetv),
-						NodeNumb = njVetv.get_ZN(NumbVetv),
-						NodeNumb2 = niVetv.get_ZN(NumbVetv),
-						Meas = Pi > 0 ? Ii : Ii * (-1),//TODO: В растре ток всегда по модулю
-						Name = "Iнач",
-						Type = TypeOi.Iij,
-						TimeMeas = DateTime.Now
-					});
+				oiList.First(x => x.NodeNumb == nodeNumb1 && x.NodeNumb2 == nodeNumb2 && x.Type == TypeOi.Iij).Meas = Ii;
+
 				double Ij = ijVetv.get_ZN(NumbVetv);
-				if (Ij != 0)
-					oiList.Add(new OperInform
-					{
-						Id = niVetv.get_ZN(NumbVetv) + njVetv.get_ZN(NumbVetv),
-						NodeNumb = njVetv.get_ZN(NumbVetv),
-						NodeNumb2 = niVetv.get_ZN(NumbVetv),
-						Meas = Pj > 0 ? Ij : Ij * (-1),//TODO: В растре ток всегда по модулю
-						Name = "Iкон",
-						Type = TypeOi.Iij,
-						TimeMeas = DateTime.Now
-					});
+				oiList.First(x => x.NodeNumb == nodeNumb2 && x.NodeNumb2 == nodeNumb1 && x.Type == TypeOi.Iij).Meas = Ij;
+
 				/*if (paralVetv.get_ZN(NumbVetv) != 0)
 				{
 					var doubleBranch = BranchList.FirstOrDefault(x => x.Ni == branch.Ni && x.Nj == branch.Nj);
@@ -373,7 +270,117 @@ namespace State_Estimation
 					BranchList.Add(branch);
 				}*/
 			}
-			return oiList;
+		}
+
+		/// <summary>
+		/// Инициализациях режима ЭС
+		/// </summary>
+		/// <param name="nodeList"></param>
+		/// <param name="branchList"></param>
+		/// <returns></returns>
+		private ObservableCollection<OperInform> InitializationAllOi(ObservableCollection<Node> nodeList,
+			ObservableCollection<Branch> branchList)
+		{
+			ObservableCollection<OperInform> allOiList = new ObservableCollection<OperInform>();
+			foreach (var node in nodeList)
+			{
+				node.P = new OperInform
+				{
+					NodeNumb = node.Numb,
+					Type = TypeOi.P,
+					Name = node.Name + "_P"
+				};
+				allOiList.Add(node.P);
+				node.Q = new OperInform
+				{
+					NodeNumb = node.Numb,
+					Type = TypeOi.Q,
+					Name = node.Name + "_Q"
+				};
+				allOiList.Add(node.Q);
+				node.U = new OperInform
+				{
+					NodeNumb = node.Numb,
+					Type = TypeOi.U,
+					Name = node.Name + "_U"
+				};
+				allOiList.Add(node.U);
+				node.Delta = new OperInform
+				{
+					NodeNumb = node.Numb,
+					Type = TypeOi.Delta,
+					Name = node.Name + "_Delta"
+				};
+				allOiList.Add(node.Delta);
+			}
+			foreach (var branch in branchList)
+			{
+				branch.Pi = new OperInform
+				{
+					NodeNumb = branch.Ni,
+					NodeNumb2 = branch.Nj,
+					Type = TypeOi.Pij,
+					Name = branch.Name + "_Pi"
+				};
+				allOiList.Add(branch.Pi);
+				branch.Pj = new OperInform
+				{
+					NodeNumb = branch.Nj,
+					NodeNumb2 = branch.Ni,
+					Type = TypeOi.Pij,
+					Name = branch.Name + "_Pj"
+				};
+				allOiList.Add(branch.Pj);
+				branch.Qi = new OperInform
+				{
+					NodeNumb = branch.Ni,
+					NodeNumb2 = branch.Nj,
+					Type = TypeOi.Qij,
+					Name = branch.Name + "_Qi"
+				};
+				allOiList.Add(branch.Qi);
+				branch.Qj = new OperInform
+				{
+					NodeNumb = branch.Nj,
+					NodeNumb2 = branch.Ni,
+					Type = TypeOi.Qij,
+					Name = branch.Name + "_Qj"
+				};
+				allOiList.Add(branch.Qj);
+				branch.Ii = new OperInform
+				{
+					NodeNumb = branch.Ni,
+					NodeNumb2 = branch.Nj,
+					Type = TypeOi.Iij,
+					Name = branch.Name + "_Ii"
+				};
+				allOiList.Add(branch.Ii);
+				branch.Ij = new OperInform
+				{
+					NodeNumb = branch.Nj,
+					NodeNumb2 = branch.Ni,
+					Type = TypeOi.Iij,
+					Name = branch.Name + "_Ij"
+				};
+				allOiList.Add(branch.Ij);
+				branch.Sigmai = new OperInform
+				{
+					NodeNumb = branch.Ni,
+					NodeNumb2 = branch.Nj,
+					Type = TypeOi.Sigma,
+					Name = branch.Name + "_Sigmai"
+				};
+				allOiList.Add(branch.Sigmai);
+				branch.Sigmaj = new OperInform
+				{
+					NodeNumb = branch.Nj,
+					NodeNumb2 = branch.Ni,
+					Type = TypeOi.Sigma,
+					Name = branch.Name + "_Sigmaj"
+				};
+				allOiList.Add(branch.Sigmaj);
+			}
+			return allOiList;
 		}
 	}
 }
