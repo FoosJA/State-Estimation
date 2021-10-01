@@ -238,10 +238,10 @@ namespace State_Estimation
 				double Qj = qjVetv.get_ZN(NumbVetv);
 				oiList.First(x => x.NodeNumb == nodeNumb2 && x.NodeNumb2 == nodeNumb1 && x.Type == TypeOi.Qij).Meas = Qj;
 
-				double Ii = iiVetv.get_ZN(NumbVetv);
+				double Ii = iiVetv.get_ZN(NumbVetv)/1000;
 				oiList.First(x => x.NodeNumb == nodeNumb1 && x.NodeNumb2 == nodeNumb2 && x.Type == TypeOi.Iij).Meas = Ii;
 
-				double Ij = ijVetv.get_ZN(NumbVetv);
+				double Ij = ijVetv.get_ZN(NumbVetv) / 1000;
 				oiList.First(x => x.NodeNumb == nodeNumb2 && x.NodeNumb2 == nodeNumb1 && x.Type == TypeOi.Iij).Meas = Ij;
 
 				/*if (paralVetv.get_ZN(NumbVetv) != 0)
