@@ -93,12 +93,16 @@ namespace State_Estimation
 			var netNodes = NodeList.Where(x => x.Type == TypeNode.Net);
 			foreach (var netNode in netNodes)
 			{
-				OperInform pNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.P, Meas = 0 };
-				OperInform qNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.Q, Meas = 0 };
-				netNode.P = pNet;
-				netNode.Q = qNet;
+				if (netNode.B==0)
+				{
+					OperInform qNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.Q, Meas = 0 };
+					netNode.Q = qNet;
+					OiList.Add(qNet);
+				}
+				OperInform pNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.P, Meas = 0 };				
+				netNode.P = pNet;				
 				OiList.Add(pNet);
-				OiList.Add(qNet);
+				
 			}
 			int nomerIteracMax = 100;
 			var baseNode = NodeList.FirstOrDefault(x => x.Type == TypeNode.Base);
@@ -212,7 +216,7 @@ namespace State_Estimation
 									gij = branchNode.R / (branchNode.R * branchNode.R + branchNode.X * branchNode.X);
 									bij = branchNode.X / (branchNode.R * branchNode.R + branchNode.X * branchNode.X);
 									gii = gij + branchNode.G;
-									bii = bij + branchNode.B / 2 * 0.000001;
+									bii = bij + branchNode.B / 2 * 0.000001 + node_i.B;
 								}
 								else
 								{
@@ -296,7 +300,7 @@ namespace State_Estimation
 									gij = branchNode.R / (branchNode.R * branchNode.R + branchNode.X * branchNode.X);
 									bij = branchNode.X / (branchNode.R * branchNode.R + branchNode.X * branchNode.X);
 									gii = gij + branchNode.G;
-									bii = bij + branchNode.B / 2 * 0.000001;
+									bii = bij + branchNode.B / 2 * 0.000001 + node_i.B;
 								}
 								else
 								{
@@ -355,7 +359,7 @@ namespace State_Estimation
 								}
 								else
 								{
-									C[m, m] =10 ;
+									C[m, m] = 10;
 								}
 
 							}
@@ -381,7 +385,7 @@ namespace State_Estimation
 								_gij = branch.R / (branch.R * branch.R + branch.X * branch.X);
 								_bij = branch.X / (branch.R * branch.R + branch.X * branch.X);
 								_gii = _gij + branch.G;
-								_bii = _bij + branch.B / 2 * 0.000001;
+								_bii = _bij + branch.B / 2 * 0.000001;// + node_i.B;
 							}
 							else
 							{
@@ -606,7 +610,7 @@ namespace State_Estimation
 						gij = branchNode.R / (branchNode.R * branchNode.R + branchNode.X * branchNode.X);
 						bij = branchNode.X / (branchNode.R * branchNode.R + branchNode.X * branchNode.X);
 						gii = gij + branchNode.G;
-						bii = bij + branchNode.B / 2 * 0.000001;
+						bii = bij + branchNode.B / 2 * 0.000001 + node.B;
 					}
 					else
 					{
@@ -712,7 +716,6 @@ namespace State_Estimation
 				branch.Qj.Est = Dij * Math.Sqrt(3) * Vi;
 				branch.Ij.Est = Math.Sqrt(Cij * Cij + Dij * Dij);
 				branch.Sigmaj.Est = Math.Atan(Dij / Cij) / (Math.PI / 180);
-
 			}
 		}
 		public ICommand DSECommand { get { return new RelayCommand(StartDynamicSE, CanSE); } }

@@ -106,7 +106,7 @@ namespace State_Estimation
 					TypeIndex = typeBus.get_ZN(NumbBus),
 					Name = nameBus.get_ZN(NumbBus),
 					Unom = Unom.get_ZN(NumbBus),
-					B = Bsh.get_ZN(NumbBus)
+					B = Bsh.get_ZN(NumbBus)*0.000001
 				};
 				double p = powerActiveGen.get_ZN(NumbBus) - powerActiveLoad.get_ZN(NumbBus);
 				double q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus);
@@ -188,6 +188,7 @@ namespace State_Estimation
 		{
 			ASTRALib.ITable NodeRastr = rastr.Tables.Item("node");
 			ASTRALib.ICol numberBus = NodeRastr.Cols.Item("ny");
+			ASTRALib.ICol Qsh = NodeRastr.Cols.Item("qsh");
 			ASTRALib.ICol powerActiveLoad = NodeRastr.Cols.Item("pn"); //активная мощность нагрузки.
 			ASTRALib.ICol powerRectiveLoad = NodeRastr.Cols.Item("qn"); //реактивная мощность нагрузки.
 			ASTRALib.ICol powerActiveGen = NodeRastr.Cols.Item("pg"); //активная мощность ген.
@@ -202,7 +203,7 @@ namespace State_Estimation
 				double P = powerActiveGen.get_ZN(NumbBus) - powerActiveLoad.get_ZN(NumbBus);
 				if (P != 0)
 					oiList.First(x => x.NodeNumb == nodeNumb && x.NodeNumb2 == 0 && x.Type == TypeOi.P).Meas = P;
-				double Q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus);
+				double Q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus)+ Qsh.get_ZN(NumbBus);
 				if (Q != 0)
 					oiList.First(x => x.NodeNumb == nodeNumb && x.NodeNumb2 == 0 && x.Type == TypeOi.Q).Meas = Q;
 				double U = voltageBus.get_ZN(NumbBus);

@@ -112,11 +112,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="ТМ и ОС">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="21*"/>
-                        <ColumnDefinition Width="989*"/>
-                    </Grid.ColumnDefinitions>
+                <Grid>                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="30"/>
@@ -125,7 +121,7 @@
                               ItemsSource="{Binding OiList,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                               AutoGenerateColumns="False"
                               SelectedValue="{Binding SelectedItems, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedItem="{Binding Path=SelectedOi,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"  Grid.RowSpan="2" >
+                              SelectedItem="{Binding Path=SelectedOi,UpdateSourceTrigger=PropertyChanged}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Path=Id}" Header="Код ти"  Width="*" />
                             <DataGridTextColumn Binding="{Binding Path=Type}" Header="Тип"  Width="*" />
@@ -136,7 +132,7 @@
                             <DataGridTextColumn Binding="{Binding Path= Error, StringFormat='0.000'}" Header="ТМ-ОС"  Width="*" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2">
+                    <StackPanel Orientation="Horizontal" Grid.Row="1">
                         <Label>Количество строк:</Label>
                         <Label  Content="{Binding ElementName=oiGrid, Path=Items.Count, UpdateSourceTrigger=PropertyChanged}"></Label>
                     </StackPanel>
