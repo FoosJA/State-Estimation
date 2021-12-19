@@ -11,7 +11,7 @@ namespace State_Estimation.Model
 	class OperInform : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
-		protected  void NotifyPropertyChanged(params string[] propertyNames)
+		protected void NotifyPropertyChanged(params string[] propertyNames)
 		{
 			if (PropertyChanged != null)
 			{
@@ -21,10 +21,20 @@ namespace State_Estimation.Model
 				}
 			}
 		}
+		private int _id;
 		/// <summary>
 		/// Идентификатор ТИ
 		/// </summary>
-		public int Id { get; set; }
+		public int Id
+		{
+			get { return _id; }
+			set
+			{
+				if (value <= 0)
+					throw new ArgumentException("Некорректный ID измерения", value.ToString());
+				_id = value;
+			}
+		}
 		/// <summary>
 		/// Тип ОИ 
 		/// </summary>
@@ -33,20 +43,42 @@ namespace State_Estimation.Model
 		/// Название ОИ
 		/// </summary>
 		public string Name { get; set; }
+
+		private int _nodeNumb1;
 		/// <summary>
 		/// Номер узла
 		/// </summary>
-		public int NodeNumb { get; set; }
+		public int NodeNumb
+		{
+			get { return _nodeNumb1; }
+			set
+			{
+				if (value <= 0)
+					throw new ArgumentException("Некорректный номер узла", value.ToString());
+				_nodeNumb1 = value;
+			}
+		}
+		private int _nodeNumb2;
 		/// <summary>
 		/// Номер узла 2
 		/// </summary>
-		public int NodeNumb2 { get; set; }
+		public int NodeNumb2
+		{
+			get { return _nodeNumb2; }
+			set
+			{
+				if (value < 0)
+					throw new ArgumentException("Некорректный номер узла", value.ToString());
+				_nodeNumb2 = value;
+			}
+		}
 
 		private double _Meas;
 		/// <summary>
 		/// Значение измерения
 		/// </summary>
-		public double Meas {
+		public double Meas
+		{
 			get { return _Meas; }
 			set { _Meas = value; NotifyPropertyChanged("Meas", "Error"); }
 		}
@@ -60,14 +92,14 @@ namespace State_Estimation.Model
 			get { return _Est; }
 			set { _Est = value; NotifyPropertyChanged("Est", "Error"); }
 		}
-		private double _error;
 		/// <summary>
 		/// Ошибка оценивания
 		/// </summary>
-		public double Error { 
-			get {  return Meas - Est;  } 	
-			//private set { _error = value; RaisePropertyChanged(""); }
+		public double Error
+		{
+			get { return Meas - Est; }
 		}
+
 		/// <summary>
 		/// Время замера
 		/// </summary>

@@ -41,7 +41,6 @@ namespace State_Estimation
 			{
 				path = openFileDialog.FileName;
 				viewModel.Log("Начато чтение файла " + path);
-				bool flagReadTM = true;
 				switch (System.IO.Path.GetExtension(openFileDialog.FileName))
 				{
 					case ".rg2":
@@ -55,8 +54,10 @@ namespace State_Estimation
 						viewModel.NodeList = reader.Item1;
 						viewModel.BranchList = reader.Item2;
 						viewModel.AllOiList = InitializationAllOi(viewModel.NodeList, viewModel.BranchList);
-
-						if (flagReadTM)//TODO: записывать данные ТМ или нет
+						viewModel.Log("Чтение расчётной модели выполнено!");
+						var result =MessageBox.Show("Считать ТМ из RastrWin3?", " Чтение ТМ",
+							MessageBoxButton.YesNo,  MessageBoxImage.Question);
+						if (result==MessageBoxResult.Yes)
 						{
 							ReadRastrTM(Rastr, viewModel.AllOiList);
 							foreach (var oi in viewModel.AllOiList)
@@ -64,12 +65,16 @@ namespace State_Estimation
 								if (oi.Meas != 0)//TODO: надо придумать как быть с сетевым узлом
 									viewModel.OiList.Add(oi);
 							}
-						}
+
+							viewModel.Log("Чтение ТМ выполнено!");
+						}	
+						
+						
 						break;
 					default:
 						break;
 				}
-				viewModel.Log("Чтение выполнено");
+				//viewModel.Log("Чтение выполнено");
 			}
 		}
 
@@ -103,7 +108,7 @@ namespace State_Estimation
 				{
 					Sta = staBus.get_ZN(NumbBus),
 					Numb = numberBus.get_ZN(NumbBus),
-					TypeIndex = typeBus.get_ZN(NumbBus),
+					Type = (TypeNode)typeBus.get_ZN(NumbBus),
 					Name = nameBus.get_ZN(NumbBus),
 					Unom = Unom.get_ZN(NumbBus),
 					B = Bsh.get_ZN(NumbBus)*0.000001
@@ -111,8 +116,8 @@ namespace State_Estimation
 				double p = powerActiveGen.get_ZN(NumbBus) - powerActiveLoad.get_ZN(NumbBus);
 				double q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus);
 				if (p == 0 && q == 0)
-					node.TypeIndex = 5;
-				node.Type = (TypeNode)node.TypeIndex;
+					node.Type = (TypeNode)5;
+				//node.Type = (TypeNode)node.TypeIndex;
 				NodeList.Add(node);
 			}
 

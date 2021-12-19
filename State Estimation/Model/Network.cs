@@ -1,22 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace State_Estimation.Model
 {
 	class Node
 	{
+		/// <summary>
+		/// Состояние узла
+		/// </summary>
 		public bool Sta { get; set; }
+		/// <summary>
+		/// Номер узла
+		/// </summary>
 		public int Numb { get; set; }
+
+		/// <summary>
+		/// Тип узла
+		/// </summary>
 		public TypeNode Type { get; set; }
+
+		/// <summary>
+		/// Строковый тип узла
+		/// </summary>
 		public string TypeStr { get { return Type.ToDescriptionString(); } }
-		public int TypeIndex { get; set; }
+		/// <summary>
+		/// Название узла
+		/// </summary>
 		public string Name { get; set; }
+		/// <summary>
+		/// Номинальное напряжение, кВ
+		/// </summary>
 		public double Unom { get; set; }
+
+		/// <summary>
+		/// Проводимость узла, мкСм
+		/// </summary>
 		public double B { get; set; }
+
+		
 		public OperInform U { get; set; }
 		public OperInform Delta { get; set; }
 		public OperInform P { get; set; }
-		public OperInform Q { get; set; }				
+		public OperInform Q { get; set; }
+	}
+	 class State
+	{
+		public Node Node;
+		public OperInform U;
+		public OperInform Delta;
 	}
 	class Branch
 	{
@@ -50,12 +82,12 @@ namespace State_Estimation.Model
 	}
 	public enum TypeNode
 	{
-		[Description("База")] Base=0,
-		[Description("Нагр")] Load=1,
-		[Description("Ген")] Gen=2,
-		[Description("Ген+")] GenP=3,
-		[Description("Ген-")] GenN=4,
-		[Description("Сет")] Net=5
+		[Description("База")] Base = 0,
+		[Description("Нагр")] Load = 1,
+		[Description("Ген")] Gen = 2,
+		[Description("Ген+")] GenP = 3,
+		[Description("Ген-")] GenN = 4,
+		[Description("Сет")] Net = 5
 	}
 
 	/// <summary>
