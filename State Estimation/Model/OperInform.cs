@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace State_Estimation.Model
 {
-	class OperInform : INotifyPropertyChanged
+	public class OperInform : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 		protected void NotifyPropertyChanged(params string[] propertyNames)
@@ -106,7 +106,7 @@ namespace State_Estimation.Model
 		public DateTime TimeMeas { get; set; }
 
 		public enum KeyType
-		{ P, Q, U, Delta, Pij, Qij, Iij, Sigma }
+		{ P=0, Q=1, U=2, Delta=3, Pij=4, Qij=5, Iij=6, Sigma=7 }
 
 	}
 }
