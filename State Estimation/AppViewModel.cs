@@ -108,40 +108,46 @@ namespace State_Estimation
 		/// </summary>
 		void StartStaticSE()
 		{
-			//Учет сетевых узлов
-			var netNodes = NodeList.Where(x => x.Type == TypeNode.Net);
-			foreach (var netNode in netNodes)
+			try
 			{
-				if (netNode.B == 0)
+				//Учет сетевых узлов
+				/*var netNodes = NodeList.Where(x => x.Type == TypeNode.Net);
+				foreach (var netNode in netNodes)
 				{
-					OperInform qNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.Q, Meas = 0 };
-					//netNode.Q = qNet;
-					OiList.Add(qNet);
+					if (netNode.B == 0)
+					{
+						OperInform qNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.Q, Meas = 0 };
+						//netNode.Q = qNet;
+						OiList.Add(qNet);
+					}
+					OperInform pNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.P, Meas = 0 };
+					//netNode.P = pNet;				
+					OiList.Add(pNet);
+				}*/
+				List<State> stateList = CreateState();
+				var baseNode = NodeList.FirstOrDefault(x => x.Type == TypeNode.Base);
+
+				NodeList.Move(NodeList.IndexOf(baseNode), NodeList.Count - 1);//TODO: возможно перемещение базы вниз не нужно
+
+				int nodeCount = NodeList.Count;
+				//кол-во компонентов вектора состояния
+				int K = 2 * nodeCount - 1;
+				int measureCount = OiList.Count;
+				if (measureCount < K)
+				{
+					throw new ArgumentException("Режим ненаблюдаем!");
+
 				}
-				OperInform pNet = new OperInform { Est = 0, NodeNumb = netNode.Numb, Type = TypeOi.P, Meas = 0 };
-				//netNode.P = pNet;				
-				OiList.Add(pNet);
-			}
-			List<State> stateList = CreateState();
-			var baseNode = NodeList.FirstOrDefault(x => x.Type == TypeNode.Base);
 
-			NodeList.Move(NodeList.IndexOf(baseNode), NodeList.Count - 1);//TODO: возможно перемещение базы вниз не нужно
+				///TODO: может когда-нибудь смогу это реализовать
+				//Matrix G = new Matrix(NodeList.Count, NodeList.Count);
+				//Matrix B = new Matrix(NodeList.Count, NodeList.Count);
 
-			int nodeCount = NodeList.Count;
-			//кол-во компонентов вектора состояния
-			int K = 2 * nodeCount - 1;
-			int measureCount = OiList.Count;
-			if (measureCount >= K)
-			{
-				Matrix G = new Matrix(NodeList.Count, NodeList.Count);
-				Matrix B = new Matrix(NodeList.Count, NodeList.Count);
-
-				foreach (var oi in OiList) //используется при старте рассчёта, 
-										   //чтобы обращаться к оценке измерения на каждой итерации
+				foreach (var oi in OiList) //используется при старте рассчёта, чтобы обращаться к оценке измерения на каждой итерации
 				{
 					oi.Est = oi.Meas;
 				}
-				
+
 				int nomerIterac = 1;
 				do
 				{
@@ -151,19 +157,26 @@ namespace State_Estimation
 					Matrix Fcalc = GetCalcVector(stateList);//матрица рассчёта параметров режима
 					Matrix F = Fcalc - Fmeas;
 					Matrix J = GetJacobian(stateList);//матрица Якоби
-					Matrix C = GetWeightMatrix(J);//матрица весовых коэффициентов*/				
+					Matrix C = GetWeightMatrix(J);//матрица весовых коэффициентов*/	
+					var maxF = Matrix.MaxElement(F);
+					if (maxF < 1 && nomerIterac == 1)
+					{
+						Log($"Итерация №{nomerIterac} \n Целевая функция F=0 \n Погрешность e =0");
+						GetAllOi(stateList);
+						break;
+					}
 					try
 					{
 						//Основной рачет
-						var maxF = Matrix.MaxElement(F);
+
 						Matrix Ft = Matrix.Transpose(F);
 						var f = Matrix.Multiply(0.5, Ft) * C * F;
 						Matrix H = Matrix.Transpose(J) * C * J;
 						Matrix grad = Matrix.Transpose(J) * C * F;
 						Matrix deltaU = H.Invert() * (-grad);
 						_error = Matrix.MaxElement(deltaU);
-						U = U + Matrix.Multiply(1, deltaU);						
-						stateList= CreateState(U, stateList);
+						U = U + Matrix.Multiply(1, deltaU);
+						stateList = CreateState(U, stateList);
 
 						/*foreach (Node node in NodeList)
 						{
@@ -185,16 +198,14 @@ namespace State_Estimation
 					}
 					catch (MException ex)
 					{
+						
 						Log($"Ошибка на итерация №{nomerIterac}: {ex.Message}");
 						break;
 					}
 				}
 				while (nomerIterac < _MaxIterac);
 			}
-			else
-				Log("Режим не наблюдаемый!");
-
-
+			catch (Exception ex) { Log($"Ошибка: {ex.Message}"); }
 		}
 
 		public ICommand DSECommand { get { return new RelayCommand(StartDynamicSE, CanSE); } }
@@ -240,7 +251,7 @@ namespace State_Estimation
 				}
 				Matrix newF = GetCalcVector(stateList);
 				var fi = Matrix.Transpose(newF) * C * (newF) + Matrix.Transpose(U - newU) * M * (U - newU);
-				CreateState(newU,stateList);
+				CreateState(newU, stateList);
 				Log($"Итерация №{nomerIterac} \n Целевая функция F={fi[0, 0]} \n Погрешность e ={_error}");
 				nomerIterac++;
 				if ((_error < _maxError) && (fi[0, 0] < 3))
@@ -282,13 +293,13 @@ namespace State_Estimation
 			foreach (var node in NodeList)
 			{
 				State st = new State { Node = node };
-				var u = OiList.FirstOrDefault(x => x.Type == TypeOi.U && x.NodeNumb == node.Numb);
+				var u = OiList.SingleOrDefault(x => x.Type == TypeOi.U && x.NodeNumb == node.Numb);
 				if (u == null)
 					st.U = node.Unom;
 				else
 					st.U = u.Meas;
 
-				var delta = OiList.FirstOrDefault(x => x.Type == TypeOi.Delta && x.NodeNumb == node.Numb);
+				var delta = OiList.SingleOrDefault(x => x.Type == TypeOi.Delta && x.NodeNumb == node.Numb);
 				if (delta == null)
 					st.Delta = 0.0001;
 				else
@@ -584,11 +595,11 @@ namespace State_Estimation
 							m++;
 							break;
 						case TypeOi.Delta:
-							if (node_i.Type != TypeNode.Base)
-							{
-								fErr[m, 0] = node_i.Delta.Est;
-								m++;
-							}
+							//if (node_i.Type != TypeNode.Base)
+							//{
+							fErr[m, 0] = node_i.Delta.Est;
+							m++;
+							//}
 							break;
 						case TypeOi.P:
 							fErr[m, 0] = node_i.P.Est;
@@ -599,8 +610,8 @@ namespace State_Estimation
 							m++;
 							break;
 					};
-				}					
-				else 
+				}
+				else
 				{
 					Branch branch = BranchList.First(x => (x.Ni == node_i.Numb && x.Nj == node_j.Numb) ||
 					  (x.Ni == node_j.Numb && x.Nj == node_i.Numb));
@@ -626,7 +637,7 @@ namespace State_Estimation
 							else { fErr[m, 0] = branch.Sigmaj.Est; }
 							m++;
 							break;
-					}	
+					}
 				}
 			}
 			return fErr;

@@ -11,6 +11,10 @@ namespace State_Estimation
 	class AppView : INotifyPropertyChanged
 	{
         public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// Передаем свойство и вызываем событие
+        /// </summary>
+        /// <param name="name"></param>
         public void RaisePropertyChanged([CallerMemberName] string name = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
