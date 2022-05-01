@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:State_Estimation"
         mc:Ignorable="d"
+          xmlns:control="http://filterdatagrid.control.com/2021"
         Title="MainWindow" Height="600" Width="1024">
     <Window.DataContext>
         <local:AppViewModel></local:AppViewModel>
@@ -41,29 +42,27 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
-                    <DataGrid x:Name="nodeGrid" Grid.Row="0"             
+                    <control:FilterDataGrid ShowStatusBar="False" ShowElapsedTime="False" 
+                                DateFormatString="d"  FilterLanguage="Russian"
+                              x:Name="nodeGrid" Grid.Row="0"             
                               ItemsSource="{Binding Path=NodeList,UpdateSourceTrigger=PropertyChanged }" 
                               AutoGenerateColumns="False"
                               SelectedValue="{Binding SelectedItems, UpdateSourceTrigger=PropertyChanged}"
                               SelectedItem="{Binding Path=SelectedNode,UpdateSourceTrigger=PropertyChanged}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Path = Numb}" Header="№"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = TypeStr}" Header="Тип"  Width="*" IsReadOnly="True" />
-                            <DataGridTextColumn Binding="{Binding Path = Name}" Header="Название"  Width="2*" />
-                            <DataGridTextColumn Binding="{Binding Path = Unom}" Header="Uном"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = B}" Header="Bш"  Width="*" />
-                            <DataGridTemplateColumn MinWidth="0" Width="5"/>
-                            <DataGridTextColumn Binding="{Binding Path = U.Est , StringFormat='0.000'}" Header="U"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Delta.Est, StringFormat='0.000'}" Header="D"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = P.Est, StringFormat='0.00'}" Header="P"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Q.Est, StringFormat='0.00'}" Header="Q"  Width="*" />
-                        </DataGrid.Columns>
-                        <DataGrid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Команда?" Command="{Binding }"/>
-                            </ContextMenu>
-                        </DataGrid.ContextMenu>
-                    </DataGrid>
+                        <control:FilterDataGrid.Columns>
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Numb}" Header="№"  Width="*" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = TypeStr}" Header="Тип"  Width="*" IsReadOnly="True" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Name}" Header="Название"  Width="2*" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Unom}" Header="Uном"  Width="*" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = B}" Header="Bш"  Width="*" />
+                                <control:DataGridTemplateColumn MinWidth="0" Width="5"/>
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = U.Est , StringFormat='0.000'}" Header="U"  Width="*" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Delta.Est, StringFormat='0.000'}" Header="D"  Width="*" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = P.Est, StringFormat='0.00'}" Header="P"  Width="*" />
+                                <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Q.Est, StringFormat='0.00'}" Header="Q"  Width="*" />
+                        </control:FilterDataGrid.Columns>
+                    </control:FilterDataGrid>
+                    
                     <StackPanel Orientation="Horizontal" Grid.Row="1">
                         <Label>Количество строк:</Label>
                         <Label  Content="{Binding ElementName=nodeGrid, Path=Items.Count, UpdateSourceTrigger=PropertyChanged}"></Label>
@@ -76,35 +75,35 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
-                    <DataGrid x:Name="branchGrid" Grid.Row="0"             
+                    <control:FilterDataGrid x:Name="branchGrid" Grid.Row="0"             
                               ItemsSource="{Binding Path=BranchList,UpdateSourceTrigger=PropertyChanged }" 
                               AutoGenerateColumns="False"
                               SelectedValue="{Binding SelectedItems, UpdateSourceTrigger=PropertyChanged}"
                               SelectedItem="{Binding Path=SelectedBranch,UpdateSourceTrigger=PropertyChanged}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Path = Numb}" Header="№"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = TypeStr}" Header="Тип"  Width="*" IsReadOnly="True"/>
-                            <DataGridTextColumn Binding="{Binding Path = Ni}" Header="Nнач"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Nj}" Header="Nкон"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Name}" Header="Название"  Width="2*" />
-                            <DataGridTextColumn Binding="{Binding Path = R , StringFormat='0.00'}" Header="R"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = X, StringFormat='0.00'}" Header="X"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = B, StringFormat='0.00'}" Header="B"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Kt , StringFormat='0.000'}" Header="Kтр"  Width="*" />
+                        <control:FilterDataGrid.Columns>
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Numb}" Header="№"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = TypeStr}" Header="Тип"  Width="*" IsReadOnly="True"/>
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Ni}" Header="Nнач"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Nj}" Header="Nкон"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Name}" Header="Название"  Width="2*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = R , StringFormat='0.00'}" Header="R"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = X, StringFormat='0.00'}" Header="X"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = B, StringFormat='0.00'}" Header="B"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Kt , StringFormat='0.000'}" Header="Kтр"  Width="*" />
                             <DataGridTemplateColumn MinWidth="0" Width="5"/>
-                            <DataGridTextColumn Binding="{Binding Path = Pi.Est, StringFormat='0.00'}" Header="Pн"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Qi.Est, StringFormat='0.00'}" Header="Qн"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Ii.Est, StringFormat='0.000'}" Header="Iн"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Pj.Est, StringFormat='0.00'}" Header="Pк"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Qj.Est, StringFormat='0.00'}" Header="Qк"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path = Ij.Est, StringFormat='0.000'}" Header="Iк"  Width="*" />
-                        </DataGrid.Columns>
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Pi.Est, StringFormat='0.00'}" Header="Pн"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Qi.Est, StringFormat='0.00'}" Header="Qн"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Ii.Est, StringFormat='0.000'}" Header="Iн"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Pj.Est, StringFormat='0.00'}" Header="Pк"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Qj.Est, StringFormat='0.00'}" Header="Qк"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path = Ij.Est, StringFormat='0.000'}" Header="Iк"  Width="*" />
+                        </control:FilterDataGrid.Columns>
                         <DataGrid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Команда" Command="{Binding }"/>
                             </ContextMenu>
                         </DataGrid.ContextMenu>
-                    </DataGrid>
+                    </control:FilterDataGrid>
                     <StackPanel Orientation="Horizontal" Grid.Row="1">
                         <Label>Количество строк:</Label>
                         <Label  Content="{Binding ElementName=branchGrid, Path=Items.Count, UpdateSourceTrigger=PropertyChanged}"></Label>
@@ -117,21 +116,21 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
-                    <DataGrid x:Name="oiGrid" Grid.Row="0"             
+                    <control:FilterDataGrid x:Name="oiGrid" Grid.Row="0"             
                               ItemsSource="{Binding OiList,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                               AutoGenerateColumns="False"
                               SelectedValue="{Binding SelectedItems, UpdateSourceTrigger=PropertyChanged}"
                               SelectedItem="{Binding Path=SelectedOi,UpdateSourceTrigger=PropertyChanged}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Path=Id}" Header="Код ти"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path=Type}" Header="Тип"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path=Name}" Header="Название"  Width="2*" />
-                            <DataGridTextColumn Binding="{Binding Path= NodeNumb}" Header="№ узла"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path= Meas, StringFormat='0.000'}" Header="ТМ"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path= Est, StringFormat='0.000'}" Header="ОС"  Width="*" />
-                            <DataGridTextColumn Binding="{Binding Path= Error, StringFormat='0.000'}" Header="ТМ-ОС"  Width="*" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                        <control:FilterDataGrid.Columns>
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path=Id}" Header="Код ти"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path=Type}" Header="Тип"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path=Name}" Header="Название"  Width="2*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path= NodeNumb}" Header="№ узла"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path= Meas, StringFormat='0.000'}" Header="ТМ"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path= Est, StringFormat='0.000'}" Header="ОС"  Width="*" />
+                            <control:DataGridTextColumn IsColumnFiltered="True" Binding="{Binding Path= Error, StringFormat='0.000'}" Header="ТМ-ОС"  Width="*" IsReadOnly="True"/>
+                        </control:FilterDataGrid.Columns>
+                    </control:FilterDataGrid>
                     <StackPanel Orientation="Horizontal" Grid.Row="1">
                         <Label>Количество строк:</Label>
                         <Label  Content="{Binding ElementName=oiGrid, Path=Items.Count, UpdateSourceTrigger=PropertyChanged}"></Label>
