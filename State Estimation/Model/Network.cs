@@ -48,10 +48,10 @@ namespace State_Estimation.Model
 
 		public Node()
 		{
-			U = new OperInform { Type=TypeOi.U};
-			Delta= new OperInform {Type = TypeOi.Delta };
-			P = new OperInform {Type = TypeOi.P };
-			Q = new OperInform {  Type = TypeOi.Q };
+			U = new OperInform { Type = TypeOi.U };
+			Delta = new OperInform { Type = TypeOi.Delta };
+			P = new OperInform { Type = TypeOi.P };
+			Q = new OperInform { Type = TypeOi.Q };
 		}
 
 		/// <summary>
