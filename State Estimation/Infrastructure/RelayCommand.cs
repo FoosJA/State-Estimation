@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace State_Estimation.Foundation
+namespace State_Estimation.Infrastructure
 {
     class RelayCommand<T> : ICommand
     {

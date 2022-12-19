@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using ASTRALib;
-using TypeOi = State_Estimation.Model.OperInform.KeyType;
+using TypeOi = State_Estimation.Model.OperationInfo.KeyType;
 
 namespace State_Estimation.Foundation
 {
@@ -12,7 +12,7 @@ namespace State_Estimation.Foundation
 		/// Чтение из .rg2 параметры узлов
 		/// </summary>
 		/// <param name="rastr"></param>
-		public static ObservableCollection<Node>  ReadRastrNode(IRastr rastr)
+		public static ObservableCollection<Node> ReadRastrNode(IRastr rastr)
 		{
 			ObservableCollection<Node> nodeList = new ObservableCollection<Node>();
 
@@ -28,25 +28,25 @@ namespace State_Estimation.Foundation
 			ASTRALib.ICol powerRectiveLoad = NodeRastr.Cols.Item("qn"); //реактивная мощность нагрузки.
 			ASTRALib.ICol powerActiveGen = NodeRastr.Cols.Item("pg"); //активная мощность нагрузки.
 			ASTRALib.ICol powerRectiveGen = NodeRastr.Cols.Item("qg"); //реактивная мощность нагрузки.	
-			
+
 			for (int NumbBus = 0; NumbBus < NodeRastr.Count; NumbBus++)
 			{
 				Node node = new Node
 				{
-					Sta = staBus.get_ZN(NumbBus),
+					State = staBus.get_ZN(NumbBus),
 					Numb = numberBus.get_ZN(NumbBus),
 					Type = (TypeNode)typeBus.get_ZN(NumbBus),
 					Name = nameBus.get_ZN(NumbBus),
 					Unom = Unom.get_ZN(NumbBus),
-					B = Bsh.get_ZN(NumbBus) * 0.000001					
+					B = Bsh.get_ZN(NumbBus) * 0.000001
 				};
-				
+
 				double p = powerActiveGen.get_ZN(NumbBus) - powerActiveLoad.get_ZN(NumbBus);
 				double q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus);
 				if (p == 0 && q == 0)
 					node.Type = (TypeNode)5;
 				nodeList.Add(node);
-			}			
+			}
 			return nodeList;
 		}
 
@@ -82,7 +82,7 @@ namespace State_Estimation.Foundation
 				branch.Type = (TypeBranch)tipVetv.get_ZN(NumbVetv);
 				branch.Ni = niVetv.get_ZN(NumbVetv);
 				branch.Nj = njVetv.get_ZN(NumbVetv);
-				branch.Paral = paralVetv.get_ZN(NumbVetv);
+				branch.ParallelNumb = paralVetv.get_ZN(NumbVetv);
 				branch.Name = nameVetv.get_ZN(NumbVetv);
 				branch.R = rVetv.get_ZN(NumbVetv);
 				branch.X = xVetv.get_ZN(NumbVetv);
@@ -91,7 +91,7 @@ namespace State_Estimation.Foundation
 				branch.Kt = ktrVetv.get_ZN(NumbVetv);
 				if (branch.Kt == 0)
 					branch.Kt = 1;
-				if (branch.Paral != 0)
+				if (branch.ParallelNumb != 0)
 				{
 					var doubleBranch = branchList.FirstOrDefault(x => x.Ni == branch.Ni && x.Nj == branch.Nj);
 					if (doubleBranch != null)
@@ -111,7 +111,7 @@ namespace State_Estimation.Foundation
 					branchList.Add(branch);
 				}
 			}
-			return  branchList;
+			return branchList;
 		}
 
 		/// <summary>
@@ -119,9 +119,9 @@ namespace State_Estimation.Foundation
 		/// </summary>
 		/// <param name="rastr"></param>
 		/// <param name="oiList"></param>
-		public static ObservableCollection<OperInform>  ReadRastrTM(IRastr rastr)
+		public static ObservableCollection<OperationInfo> ReadRastrTM(IRastr rastr)
 		{
-			ObservableCollection<OperInform> oiList = new ObservableCollection<OperInform>();
+			ObservableCollection<OperationInfo> oiList = new ObservableCollection<OperationInfo>();
 			ASTRALib.ITable NodeRastr = rastr.Tables.Item("node");
 			ASTRALib.ICol numberBus = NodeRastr.Cols.Item("ny");
 			ASTRALib.ICol Qsh = NodeRastr.Cols.Item("qsh");
@@ -138,34 +138,34 @@ namespace State_Estimation.Foundation
 
 				double P = powerActiveGen.get_ZN(NumbBus) - powerActiveLoad.get_ZN(NumbBus);
 				//if (P != 0)
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb,
 					Type = TypeOi.P,
-					Meas = P
+					Measurement = P
 				});
 
 				double Q = powerRectiveGen.get_ZN(NumbBus) - powerRectiveLoad.get_ZN(NumbBus) + Qsh.get_ZN(NumbBus);
 				//if (Q != 0)
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb,
 					Type = TypeOi.Q,
-					Meas = Q
+					Measurement = Q
 				});
 				double U = voltageBus.get_ZN(NumbBus);
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb,
 					Type = TypeOi.U,
-					Meas = U
+					Measurement = U
 				});
 				double Delta = DeltaBus.get_ZN(NumbBus);
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb,
 					Type = TypeOi.Delta,
-					Meas = Delta
+					Measurement = Delta
 				});
 			}
 
@@ -185,57 +185,57 @@ namespace State_Estimation.Foundation
 				int nodeNumb2 = njVetv.get_ZN(NumbVetv);
 
 				double Pi = -piVetv.get_ZN(NumbVetv);
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb1,
 					NodeNumb2 = nodeNumb2,
 					Type = TypeOi.Pij,
-					Meas = Pi
+					Measurement = Pi
 				});
 
 				double Qi = -qiVetv.get_ZN(NumbVetv);
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb1,
 					NodeNumb2 = nodeNumb2,
 					Type = TypeOi.Qij,
-					Meas = Qi
+					Measurement = Qi
 				});
 
 				double Pj = pjVetv.get_ZN(NumbVetv);
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb2,
 					NodeNumb2 = nodeNumb1,
 					Type = TypeOi.Pij,
-					Meas = Pj
+					Measurement = Pj
 				});
 
 				double Qj = qjVetv.get_ZN(NumbVetv);
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb2,
 					NodeNumb2 = nodeNumb1,
 					Type = TypeOi.Qij,
-					Meas = Qj
+					Measurement = Qj
 				});
 
 				double Ii = iiVetv.get_ZN(NumbVetv) / 1000;
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb1,
 					NodeNumb2 = nodeNumb2,
 					Type = TypeOi.Iij,
-					Meas = Ii
+					Measurement = Ii
 				});
 
 				double Ij = ijVetv.get_ZN(NumbVetv) / 1000;
-				oiList.Add(new OperInform
+				oiList.Add(new OperationInfo
 				{
 					NodeNumb = nodeNumb2,
 					NodeNumb2 = nodeNumb1,
 					Type = TypeOi.Iij,
-					Meas = Ij
+					Measurement = Ij
 				});
 				//TODO: необходимо проверить параллельность ветвей
 				/*if (paralVetv.get_ZN(NumbVetv) != 0)

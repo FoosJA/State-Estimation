@@ -104,7 +104,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\DynamicStateEstimationCommand.cs" />
+    <Compile Include="Command\LoadCommand.cs" />
+    <Compile Include="Command\SettingsCommand.cs" />
+    <Compile Include="Command\StaticStateEstimationCommand.cs" />
     <Compile Include="Foundation\RastrWinReader.cs" />
+    <Compile Include="Infrastructure\MyEnumExtensions.cs" />
+    <Compile Include="Model\Branch.cs" />
+    <Compile Include="Model\Estimation.cs" />
+    <Compile Include="Model\Node.cs" />
+    <Compile Include="Model\State.cs" />
+    <Compile Include="Model\TypeBranch.cs" />
+    <Compile Include="Model\TypeNode.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
@@ -119,7 +130,7 @@
     <Compile Include="AppView.cs" />
     <Compile Include="AppViewModel.cs" />
     <Compile Include="Foundation\Matrix.cs" />
-    <Compile Include="Foundation\RelayCommand.cs" />
+    <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -130,8 +141,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\Network.cs" />
-    <Compile Include="Model\OperInform.cs" />
+    <Compile Include="Model\OperationInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -158,5 +168,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

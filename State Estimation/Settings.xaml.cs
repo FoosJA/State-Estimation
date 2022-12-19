@@ -28,7 +28,7 @@ namespace State_Estimation
 			InitializeComponent();
 			FlagVesCoef = true;
 			//MaxError = 0.1;
-			//MaxIterac = 100;
+			//MaxIteration = 100;
 			//A = 0;
 		}
 		

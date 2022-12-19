@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace State_Estimation.Foundation
 {
-	class Matrix
+	public class Matrix
 	{
 		/// <summary>
 		/// строка
@@ -19,15 +15,15 @@ namespace State_Estimation.Foundation
 		/// <summary>
 		/// массив
 		/// </summary>
-		public double[,] mat;
+		private double[,] mat;
 		/// <summary>
 		/// Нижняя треугольная матрица 
 		/// </summary>
-		public Matrix L;
+		private Matrix L;
 		/// <summary>
 		/// Верхняя треугольная матрица
 		/// </summary>
-		public Matrix U;
+		private Matrix U;
 
 		private int[] pi;
 		private double detOfP = 1;

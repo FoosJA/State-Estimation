@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace State_Estimation.Model
 {
-	public class OperInform : INotifyPropertyChanged
+	public class OperationInfo : INotifyPropertyChanged
 	{
+		public OperationInfo() { }
+		public OperationInfo(KeyType type)
+		{
+			Type = type;
+		}
+
 		public event PropertyChangedEventHandler PropertyChanged;
-		protected void NotifyPropertyChanged(params string[] propertyNames)
+
+		private void NotifyPropertyChanged(params string[] propertyNames)
 		{
 			if (PropertyChanged != null)
 			{
@@ -21,13 +23,14 @@ namespace State_Estimation.Model
 				}
 			}
 		}
+
 		private int _id;
 		/// <summary>
 		/// Идентификатор ТИ
 		/// </summary>
 		public int Id
 		{
-			get { return _id; }
+			get => _id;
 			set
 			{
 				if (value <= 0)
@@ -35,22 +38,25 @@ namespace State_Estimation.Model
 				_id = value;
 			}
 		}
+
 		/// <summary>
 		/// Тип ОИ 
 		/// </summary>
 		public KeyType Type { get; set; }
+
 		/// <summary>
 		/// Название ОИ
 		/// </summary>
 		public string Name { get; set; }
 
 		private int _nodeNumb1;
+
 		/// <summary>
 		/// Номер узла
 		/// </summary>
 		public int NodeNumb
 		{
-			get { return _nodeNumb1; }
+			get => _nodeNumb1;
 			set
 			{
 				if (value <= 0)
@@ -58,13 +64,15 @@ namespace State_Estimation.Model
 				_nodeNumb1 = value;
 			}
 		}
+
 		private int _nodeNumb2;
+
 		/// <summary>
 		/// Номер узла 2
 		/// </summary>
 		public int NodeNumb2
 		{
-			get { return _nodeNumb2; }
+			get => _nodeNumb2;
 			set
 			{
 				if (value < 0)
@@ -73,32 +81,31 @@ namespace State_Estimation.Model
 			}
 		}
 
-		private double _Meas;
+		private double _measurement;
+
 		/// <summary>
 		/// Значение измерения
 		/// </summary>
-		public double Meas
+		public double Measurement
 		{
-			get { return _Meas; }
-			set { _Meas = value; NotifyPropertyChanged("Meas", "Error"); }
+			get => _measurement;
+			set { _measurement = value; NotifyPropertyChanged("Measurement", "Error"); }
 		}
 
-		private double _Est;
+		private double _estimation;
 		/// <summary>
 		/// Оцененное значение
 		/// </summary>
-		public double Est
+		public double Estimation
 		{
-			get { return _Est; }
-			set { _Est = value; NotifyPropertyChanged("Est", "Error"); }
+			get => _estimation;
+			set { _estimation = value; NotifyPropertyChanged("Estimation", "Error"); }
 		}
+
 		/// <summary>
 		/// Ошибка оценивания
 		/// </summary>
-		public double Error
-		{
-			get { return Meas - Est; }
-		}
+		public double Error => Measurement - Estimation;
 
 		/// <summary>
 		/// Время замера
@@ -106,7 +113,7 @@ namespace State_Estimation.Model
 		public DateTime TimeMeas { get; set; }
 
 		public enum KeyType
-		{ P=0, Q=1, U=2, Delta=3, Pij=4, Qij=5, Iij=6, Sigma=7 }
+		{ P = 0, Q = 1, U = 2, Delta = 3, Pij = 4, Qij = 5, Iij = 6, Sigma = 7 }
 
 	}
 }
