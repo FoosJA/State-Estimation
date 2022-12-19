@@ -22,7 +22,7 @@
             <RowDefinition Height="15" />
         </Grid.RowDefinitions>
         <Menu  VerticalAlignment="Center"   Background="Transparent"    Grid.Row="0">
-            <MenuItem Header="Подключение"  Command="{}" />
+            
             <MenuItem Header="Настройки"    Command="{Binding SettingsCommand}"
                       IsEnabled="{Binding CheckButtonIsEnabled, UpdateSourceTrigger=PropertyChanged}" />
         </Menu>

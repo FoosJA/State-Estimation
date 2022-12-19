@@ -29,7 +29,7 @@ namespace State_Estimation
 		/// </summary>
 		public ObservableCollection<Node> NodeList
 		{
-			get { return _nodeList; }
+			get => _nodeList;
 			set { _nodeList = value; RaisePropertyChanged(); }
 		}
 		/// <summary>
@@ -206,6 +206,7 @@ namespace State_Estimation
 				while (nomerIterac < _MaxIterac);
 			}
 			catch (Exception ex) { Log($"Ошибка: {ex.Message}"); }
+			Log($"Статическое ОС выполнено");
 		}
 
 		public ICommand DSECommand { get { return new RelayCommand(StartDynamicSE, CanSE); } }
