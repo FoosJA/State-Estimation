@@ -6,7 +6,7 @@ using State_Estimation.Command;
 
 namespace State_Estimation
 {
-	internal class AppViewModel : AppView
+	public class AppViewModel : AppView
 	{
 		public AppViewModel()
 		{
@@ -14,6 +14,8 @@ namespace State_Estimation
 			DSECommand = new DynamicStateEstimationCommand(this);
 			SettingsCommand = new SettingsCommand(this);
 			LoadCommand = new LoadCommand(this);
+			LoadOiCommand = new LoadOiCommand(this);
+			SaveCommand = new SaveCommand(this);
 		}
 
 		public int MaxIteration = 100;
@@ -73,5 +75,8 @@ namespace State_Estimation
 		public ICommand SSECommand { get; }
 		public ICommand DSECommand { get; }
 		public ICommand LoadCommand { get; }
+		public ICommand LoadOiCommand { get; }
+		public ICommand SaveCommand { get; }
+		public ICommand SaveOiCommand { get; }
 	}
 }

@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace State_Estimation.Command
 {
-	internal class StaticStateEstimationCommand : ICommand
+	public class StaticStateEstimationCommand : ICommand
 	{
 		private readonly AppViewModel _vm;
 

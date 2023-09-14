@@ -40,9 +40,8 @@ namespace State_Estimation.Command
 						var result = MessageBox.Show("Считать ТМ из RastrWin3?", " Чтение ТМ", MessageBoxButton.YesNo, MessageBoxImage.Question);
 						if (result == MessageBoxResult.Yes)
 						{
-
-							_vm.OiList = RastrWinReader.ReadRastrTM(rastr);//TODO: надо придумать как быть с сетевым узлом		
-							_vm.Log("Чтение ТМ выполнено!");
+							_vm.LoadOiCommand.Execute(rastr);
+							
 						}
 						break;
 					case ".csv":
@@ -65,7 +64,6 @@ namespace State_Estimation.Command
 						}
 						break;
 				}
-
 			}
 		}
 

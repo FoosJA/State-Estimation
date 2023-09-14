@@ -41,6 +41,24 @@ namespace State_Estimation.Model
 			Sigmaj = new OperationInfo(OperationInfo.KeyType.Sigma);
 		}
 
+		public Branch(bool sta, int numb, TypeBranch type, int ni, int nj, int parallelNumb, string name, double r, double x, double b, double g, double kt):this()
+		{
+			Sta = sta;
+			Numb = numb;
+			Type = type;
+			Ni = ni;
+			Nj = nj;
+			ParallelNumb = parallelNumb;
+			Name = name;
+			R = r;
+			X = x;
+			B = b;
+			G = g;
+			Kt = kt;
+		}
+
+
+
 		/// <summary>
 		/// Расчет параметров режима ветви
 		/// </summary>
@@ -118,6 +136,11 @@ namespace State_Estimation.Model
 				}
 			}
 			return (gij, bij, gii, bii);
+		}
+
+		public override string ToString()
+		{
+			return $"{Sta};{Numb};{Type};{Ni};{Nj};{ParallelNumb};{Name};{R};{X};{B};{G};{Kt}";
 		}
 	}
 }

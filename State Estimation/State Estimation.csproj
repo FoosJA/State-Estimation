@@ -106,6 +106,8 @@
     </ApplicationDefinition>
     <Compile Include="Command\DynamicStateEstimationCommand.cs" />
     <Compile Include="Command\LoadCommand.cs" />
+    <Compile Include="Command\LoadOiCommand.cs" />
+    <Compile Include="Command\SaveCommand.cs" />
     <Compile Include="Command\SettingsCommand.cs" />
     <Compile Include="Command\StaticStateEstimationCommand.cs" />
     <Compile Include="Foundation\RastrWinReader.cs" />
@@ -168,6 +170,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Image\oi.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\nodes.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

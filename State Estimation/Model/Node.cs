@@ -53,6 +53,16 @@ namespace State_Estimation.Model
 			Q = new OperationInfo(OperationInfo.KeyType.Q);
 		}
 
+		public Node(bool state, int numb, TypeNode type, string name, double unom, double bsh) : this()
+		{
+			State = state;
+			Numb = numb;
+			Type = type;
+			Name = name;
+			Unom = unom;
+			B = bsh;
+		}
+
 		/// <summary>
 		/// Расчёт параметров узлов на основе ветвей
 		/// </summary>
@@ -78,5 +88,9 @@ namespace State_Estimation.Model
 			Q.Estimation = Qest;
 		}
 
+		public override string ToString()
+		{
+			return $"{State};{Numb};{Type};{Name};{Unom};{B}";
+		}
 	}
 }

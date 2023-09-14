@@ -8,7 +8,7 @@ using State_Estimation.Infrastructure;
 
 namespace State_Estimation
 {
-	internal class AppView : INotifyPropertyChanged
+	public class AppView : INotifyPropertyChanged
 	{
 		private readonly string path = @"C:\temp\StateEstimation.log";
 		public void Log(string message)
