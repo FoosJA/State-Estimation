@@ -3,6 +3,7 @@ using State_Estimation.Command;
 using System.Windows.Input;
 using State_Estimation.Model;
 using System.Collections.ObjectModel;
+using State_Estimation.Foundation;
 
 namespace Tests
 {
@@ -62,15 +63,17 @@ namespace Tests
             command.Execute(null);
 
             var stateVector = vm.StateVectorList.Last();
-            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1);
-            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1);
-            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1);
-            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1);
-            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1);
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3х узловая схема статОс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3х узловая схема статОс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3х узловая схема статОс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3х узловая схема статОс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3х узловая схема статОс: ошибка расчета U");
 
             var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
-            Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1);
-            Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1);
+            Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
+                "3х узловая схема статОс: ошибка расчета Pij");
+            Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
+                "3х узловая схема статОс: ошибка расчета Qij");
         }
 
         [Fact]
@@ -95,26 +98,12 @@ namespace Tests
 
             Estimation.GetAllOi(stateList, nodeList, branchList);
 
-            try
-            {
-                Assert.True(Math.Abs(node1.P.Estimation + 99.764) < 0.1);
-                Assert.True(Math.Abs(node1.Q.Estimation + 49.88205) < 0.1);
-            }
-            catch
-            {
-                throw new Exception("Ошибка расчета параметров узла по вектору состояния");
-            }
+            Assert.True(Math.Abs(node1.P.Estimation + 99.764) < 0.1, "Некорректный расчет Pi по U");
+            Assert.True(Math.Abs(node1.Q.Estimation + 49.88205) < 0.1, "Некорректный расчет Qi по U");
 
-            try
-            {
-                Assert.True(Math.Abs(branch1.Pj.Estimation - 112.227) < 0.1);
-                Assert.True(Math.Abs(branch1.Qj.Estimation - 62.345) < 0.1);
-                Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 644.528) < 0.1);
-            }
-            catch 
-            {
-                throw new Exception("Ошибка расчета параметров ветви по вектору состояния");
-            }
+            Assert.True(Math.Abs(branch1.Pj.Estimation - 112.227) < 0.1, "Некорректный расчет Pij по U");
+            Assert.True(Math.Abs(branch1.Qj.Estimation - 62.345) < 0.1, "Некорректный расчет Qij по U");
+            Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 644.528) < 0.1, "Некорректный расчет Iij по U");
         }
 
         [Fact]
@@ -139,26 +128,80 @@ namespace Tests
 
             Estimation.GetAllOi(stateList, nodeList, branchList);
 
-            try
+            Assert.True(Math.Abs(node1.P.Estimation + 99.731) < 0.1, "Некорректный расчет Pi по U");
+            Assert.True(Math.Abs(node1.Q.Estimation + 49.866) < 0.1, "Некорректный расчет Qi по U");
+
+            Assert.True(Math.Abs(branch1.Pj.Estimation - 123.116) < 0.1, "Некорректный расчет Pij по U");
+            Assert.True(Math.Abs(branch1.Qj.Estimation - 77.846) < 0.1, "Некорректный расчет Qij по U");
+            Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 731.29) < 0.1, "Некорректный расчет Iij по U");
+        }
+
+        [Fact]
+        public void SimpleKalman2D()
+        {
+            var measurements = new List<Matrix>();
+            for (var i = 0; i < 3; i++)
             {
-                Assert.True(Math.Abs(node1.P.Estimation + 99.731) < 0.1);
-                Assert.True(Math.Abs(node1.Q.Estimation + 49.866) < 0.1);
-            }
-            catch
-            {
-                throw new Exception("Ошибка расчета параметров узла по вектору состояния");
+                var item = new Matrix(1, 1);
+                item[0, 0] = i + 1;
+                measurements.Add(item);
             }
 
-            try
+            const int row = 2;
+            const int col = 2;
+
+            var f = new Matrix(row, col);
+            f[0, 0] = 1;
+            f[0, 1] = 1;
+            f[1, 0] = 0;
+            f[1, 1] = 1;
+
+            var h = new Matrix(1, col);
+            h[0, 0] = 1;
+            h[0, 1] = 0;
+
+            var r = new Matrix(1, 1);
+            r[0, 0] = 1;
+
+            var q = new Matrix(row, 1);
+            q[0, 0] = 0;
+            q[1, 0] = 0;
+
+            var c = new Matrix(row, col);
+            c[0, 0] = 0;
+            c[0, 1] = 0;
+            c[1, 0] = 0;
+            c[1, 1] = 0;
+
+            var kalman = new KalmanFilter(q, r, f, h, c);
+
+            var x = new Matrix(row, 1);
+            x[0, 0] = 0;
+            x[1, 0] = 0;
+
+            var p = new Matrix(row, col);
+            p[0, 0] = 1000;
+            p[0, 1] = 0;
+            p[1, 0] = 0;
+            p[1, 1] = 1000;
+
+            // Задаем начальные значение State и Covariance
+            kalman.SetState(x, p);
+
+            foreach (var measureMatrix in measurements)
             {
-                Assert.True(Math.Abs(branch1.Pj.Estimation - 123.116) < 0.1);
-                Assert.True(Math.Abs(branch1.Qj.Estimation - 77.846) < 0.1);
-                Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 731.29) < 0.1);
+                kalman.Correct(measureMatrix);
             }
-            catch
-            {
-                throw new Exception("Ошибка расчета параметров ветви по вектору состояния");
-            }
+
+            var state = kalman.State;
+            var covariance = kalman.Covariance;
+            Assert.True(Math.Abs(state[0, 0] - 3.9996) < 0.01 && Math.Abs(state[1, 0] - 0.9999) < 0.01,
+                "вектор состояния не совпадает с результатом");
+            
+            Assert.True(Math.Abs(covariance[0, 0] - 2.331) < 0.01 && Math.Abs(covariance[0, 1] - 0.99916) < 0.01
+                                                                  && Math.Abs(covariance[1, 0] - 0.999167) < 0.01 &&
+                                                                  Math.Abs(covariance[1, 1] - 0.4995) < 0.01,
+                "ковариация не совпадает с результатом");
         }
     }
 }
