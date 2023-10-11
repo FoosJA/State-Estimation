@@ -10,7 +10,7 @@ namespace Tests
     public class LogicTests
     {
         [Fact]
-        public void StateEstimationThreeNodes()
+        public void SSEThreeNodes()
         {
             var vm = new AppViewModel();
 
@@ -147,39 +147,40 @@ namespace Tests
                 measurements.Add(item);
             }
 
-            const int row = 2;
+            const int k = 2;
             const int col = 2;
+            const int m = 1;
 
-            var f = new Matrix(row, col);
+            var f = new Matrix(k, k);
             f[0, 0] = 1;
             f[0, 1] = 1;
             f[1, 0] = 0;
             f[1, 1] = 1;
 
-            var h = new Matrix(1, col);
-            h[0, 0] = 1;
-            h[0, 1] = 0;
+            var j = new Matrix(m, k);
+            j[0, 0] = 1;
+            j[0, 1] = 0;
 
-            var r = new Matrix(1, 1);
-            r[0, 0] = 1;
+            var q = new Matrix(m, m);
+            q[0, 0] = 1;
 
-            var q = new Matrix(row, 1);
-            q[0, 0] = 0;
-            q[1, 0] = 0;
+            var b = new Matrix(k, 1);
+            b[0, 0] = 0;
+            b[1, 0] = 0;
 
-            var c = new Matrix(row, col);
+            var c = new Matrix(k, col);
             c[0, 0] = 0;
             c[0, 1] = 0;
             c[1, 0] = 0;
             c[1, 1] = 0;
 
-            var kalman = new KalmanFilter(q, r, f, h, c);
+            var kalman = new KalmanFilter(b, q, f, j, c);
 
-            var x = new Matrix(row, 1);
+            var x = new Matrix(k, 1);
             x[0, 0] = 0;
             x[1, 0] = 0;
 
-            var p = new Matrix(row, col);
+            var p = new Matrix(k, col);
             p[0, 0] = 1000;
             p[0, 1] = 0;
             p[1, 0] = 0;
@@ -197,11 +198,191 @@ namespace Tests
             var covariance = kalman.Covariance;
             Assert.True(Math.Abs(state[0, 0] - 3.9996) < 0.01 && Math.Abs(state[1, 0] - 0.9999) < 0.01,
                 "вектор состо€ни€ не совпадает с результатом");
-            
+
             Assert.True(Math.Abs(covariance[0, 0] - 2.331) < 0.01 && Math.Abs(covariance[0, 1] - 0.99916) < 0.01
                                                                   && Math.Abs(covariance[1, 0] - 0.999167) < 0.01 &&
                                                                   Math.Abs(covariance[1, 1] - 0.4995) < 0.01,
                 "ковариаци€ не совпадает с результатом");
+        }
+
+
+        [Fact]
+        public void DSEThreeNodes()
+        {
+            var vm = new AppViewModel();
+
+            #region подготовка схемы
+
+            var node1 = new Node(true, 1, TypeNode.Gen, "узел 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "узел 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "узел 3", 115, 0);
+            vm.NodeList = new ObservableCollection<Node>
+            {
+                node3,
+                node1,
+                node2
+            };
+
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "ветвь 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "ветвь 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "ветвь 3-2", 15, 30, 0, 0, 1);
+            vm.BranchList = new ObservableCollection<Branch>
+            {
+                branch1,
+                branch2,
+                branch3
+            };
+
+            #endregion
+
+            #region подготовка ќ»
+
+            var p1 = new OperationInfo() { NodeNumb = 1, Type = OperationInfo.KeyType.P, Measurement = 30 };
+            var q1 = new OperationInfo() { NodeNumb = 1, Type = OperationInfo.KeyType.Q, Measurement = 19 };
+
+            var p3 = new OperationInfo() { NodeNumb = 3, Type = OperationInfo.KeyType.P, Measurement = 19 };
+            var q3 = new OperationInfo() { NodeNumb = 3, Type = OperationInfo.KeyType.Q, Measurement = 2 };
+
+            var p32 = new OperationInfo()
+                { NodeNumb = 3, NodeNumb2 = 2, Type = OperationInfo.KeyType.Pij, Measurement = 21 };
+            var q32 = new OperationInfo()
+                { NodeNumb = 3, NodeNumb2 = 2, Type = OperationInfo.KeyType.Qij, Measurement = 6 };
+
+            var u3 = new OperationInfo()
+                { NodeNumb = 3, Type = OperationInfo.KeyType.U, Measurement = 115 };
+
+            vm.OiList = new ObservableCollection<OperationInfo>
+            {
+                p1,
+                q1,
+                p3,
+                q3,
+                p32,
+                q32,
+                u3
+            };
+
+            #endregion
+
+
+            ICommand command = new DynamicStateEstimationCommand(vm);
+            command.Execute(null);
+
+            var stateVector = vm.StateVectorList.Last();
+            //TODO: так и не получилось добитьс€ одинаковых результатов с фильтром калмана
+            //тут при q=по весовым, c=0.02*0.02, p=0 6 итераций
+            Assert.True(Math.Abs(stateVector[0, 0] - 115.642) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.0473) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 109.5455) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.5036) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 109.6079) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+
+            var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
+            Assert.True(Math.Abs(resultNode2.P.Estimation + 42.407) < 0.1,
+                "3х узлова€ схема статќс: ошибка расчета Pij");
+            Assert.True(Math.Abs(resultNode2.Q.Estimation + 7.703) < 0.1,
+                "3х узлова€ схема статќс: ошибка расчета Qij");
+        }
+
+        [Fact]
+        public void SSEThreeNodesByOnlyVoltage()
+        {
+            var vm = new AppViewModel();
+            CreateModel(vm);
+
+            ICommand command = new StaticStateEstimationCommand(vm);
+            command.Execute(null);
+
+            var stateVector = vm.StateVectorList.Last();
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+
+            var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
+            Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
+                "3х узлова€ схема статќс: ошибка расчета Pij");
+            Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
+                "3х узлова€ схема статќс: ошибка расчета Qij");
+        }
+
+        [Fact]
+        public void DSEThreeNodesByOnlyVoltage()
+        {
+            var vm = new AppViewModel();
+            CreateModel(vm);
+
+            ICommand command = new DynamicStateEstimationCommand(vm);
+            command.Execute(null);
+
+            var stateVector = vm.StateVectorList.Last();
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3х узлова€ схема статќс: ошибка расчета U");
+
+            var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
+            Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
+                "3х узлова€ схема статќс: ошибка расчета Pij");
+            Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
+                "3х узлова€ схема статќс: ошибка расчета Qij");
+        }
+
+        private void CreateModel(AppViewModel vm)
+        {
+            #region подготовка схемы
+
+            var node1 = new Node(true, 1, TypeNode.Gen, "узел 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "узел 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "узел 3", 115, 0);
+            vm.NodeList = new ObservableCollection<Node>
+            {
+                node3,
+                node1,
+                node2
+            };
+
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "ветвь 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "ветвь 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "ветвь 3-2", 15, 30, 0, 0, 1);
+            vm.BranchList = new ObservableCollection<Branch>
+            {
+                branch1,
+                branch2,
+                branch3
+            };
+
+            #endregion
+
+            #region подготовка ќ»
+
+            var u1 = new OperationInfo()
+                { NodeNumb = 1, Type = OperationInfo.KeyType.U, Measurement = 116.007 };
+            var delta1 = new OperationInfo()
+                { NodeNumb = 1, Type = OperationInfo.KeyType.Delta, Measurement = 0.000746 };
+            var u2 = new OperationInfo()
+                { NodeNumb = 2, Type = OperationInfo.KeyType.U, Measurement = 110.73679 };
+            var delta2 = new OperationInfo()
+                { NodeNumb = 2, Type = OperationInfo.KeyType.Delta, Measurement = -2.43292 };
+            var u3 = new OperationInfo()
+                { NodeNumb = 3, Type = OperationInfo.KeyType.U, Measurement = 114.99987 };
+            var delta3 = new OperationInfo()
+                { NodeNumb = 3, Type = OperationInfo.KeyType.Delta, Measurement = 0 };
+
+
+            vm.OiList = new ObservableCollection<OperationInfo>
+            {
+                u1,
+                delta1,
+                u2,
+                delta2,
+                u3,
+                delta3,
+            };
+
+            #endregion
         }
     }
 }

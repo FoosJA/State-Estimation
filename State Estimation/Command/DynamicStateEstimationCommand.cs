@@ -20,11 +20,23 @@ namespace State_Estimation.Command
 
         public void Execute(object parameter)
         {
-            List<State> stateList = Estimation.CreateStateList(_vm.NodeList, _vm.OiList);
-
+            var stateList = Estimation.CreateStateList(_vm.NodeList, _vm.OiList);
             var baseNode = _vm.NodeList.FirstOrDefault(x => x.Type == TypeNode.Base);
             _vm.NodeList.Move(_vm.NodeList.IndexOf(baseNode),
                 _vm.NodeList.Count - 1); //TODO: возможно перемещение базы вниз не нужно, нужно. Надо оптимизировать
+
+            var nodeCount = _vm.NodeList.Count;
+            //кол-во компонентов вектора состояния
+            var K = 2 * nodeCount - 1;
+            var measureCount = _vm.OiList.Count;
+            if (measureCount < K)
+            {
+                throw new ArgumentException("Режим ненаблюдаем!");
+            }
+
+            ///TODO: может когда-нибудь смогу это реализовать
+            //Matrix G = new Matrix(NodeList.Count, NodeList.Count);
+            //Matrix B = new Matrix(NodeList.Count, NodeList.Count);
 
             foreach (var oi in
                      _vm.OiList) //используется при старте рассчёта, чтобы обращаться к оценке измерения на каждой итерации
@@ -33,47 +45,35 @@ namespace State_Estimation.Command
             }
 
             Matrix U = Estimation.GetStateVector(stateList, _vm.NodeList); //вектор состояния
-            Matrix Dyn = Estimation.GetTrancMatrix(_vm.NodeList.Count); //матрица перехода	
-            Matrix F = Estimation.GetMeasVector(_vm.OiList); //матрица измерений
-            int nomerIterac = 1;
-            do
-            {
-                Matrix J = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList); //матрица Якоби
-                Matrix C = Estimation.GetWeightMatrix(J, _vm.OiList,
-                    _vm.GetRatioByJacobi); //матрица весовых коэффициентов
-                Matrix Uforecast = Dyn * U;
-                Matrix errorForecast = Estimation.GetCalcVector(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
-                //Matrix errorForecast = F - Fforecast;	
-                Matrix P = (Matrix.Transpose(J) * C.Invert() * J).Invert();
-                double W = 2; //ковариационная матрица шума модели
-                Matrix M = Dyn * P * Matrix.Transpose(Dyn); // + W; //предсказание ошибки
-                Matrix KalmanKoef = M * Matrix.Transpose(J) * (C + J * M * Matrix.Transpose(J)).Invert();
-                var t = KalmanKoef * errorForecast;
-                Matrix newU = Uforecast + t;
-                var error = Matrix.MaxElement(newU - U);
-                P = KalmanKoef * J * M; //или M-KalmanKoef * J * M
-                _vm.StateVectorList.Add(newU);
-                foreach (Node node in _vm.NodeList)
-                {
-                    int j = _vm.NodeList.IndexOf(node) * 2;
-                    node.U.Estimation = newU[j, 0];
-                    if (node.Type != TypeNode.Base)
-                    {
-                        node.Delta.Estimation = newU[j + 1, 0];
-                    }
-                }
+            Matrix J = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList); //матрица Якоби
 
-                Matrix newF = Estimation.GetCalcVector(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
-                var fi = Matrix.Transpose(newF) * C * (newF) + Matrix.Transpose(U - newU) * M * (U - newU);
-                stateList = Estimation.UpdateState(newU, stateList);
-                _vm.Log($"Итерация №{nomerIterac} \n Целевая функция F={fi[0, 0]} \n Погрешность e ={error}");
-                nomerIterac++;
-                if ((error < _vm.MaxError) && (fi[0, 0] < 3))
-                {
-                    Estimation.GetAllOi(stateList, _vm.NodeList, _vm.BranchList);
-                    break;
-                }
-            } while (nomerIterac < _vm.MaxIteration);
+            var b = Matrix.ZeroMatrix(K, 1); // УВ нет поэтому 0
+            var q = Estimation.GetWeightMatrix(J, _vm.OiList, _vm.GetRatioByJacobi); //матрица весовых коэффициентов
+            var f = Matrix.IdentityMatrix(K, K);
+
+            var c = Matrix.DiagonalMatrix(K, K, 0.02 * 0.02);
+            var p = Matrix.ZeroMatrix(K, K);//Квадратная матрица, порядок матрицы равен размеру вектора состояния
+
+
+            var kalman = new KalmanFilter(b, q, f, J, c);
+            kalman.SetState(U, p);
+
+            Matrix F = Estimation.GetMeasVector(_vm.OiList); //матрица измерений
+            var measure = new List<Matrix>();
+            measure.Add(F);
+            measure.Add(F);
+            measure.Add(F);
+            measure.Add(F);
+            measure.Add(F);
+            measure.Add(F);
+            foreach (var meas in measure)
+            {
+                kalman.Correct(meas);
+                _vm.StateVectorList.Add(kalman.State);
+            }
+
+            stateList = Estimation.UpdateState(kalman.State, stateList);
+            Estimation.GetAllOi(stateList, _vm.NodeList, _vm.BranchList);
         }
 
         public event EventHandler CanExecuteChanged
