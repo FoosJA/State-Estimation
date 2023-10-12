@@ -64,44 +64,36 @@ namespace State_Estimation.Command
                 }
 
                 var nomerIterac = 1;
-
+                Matrix U = Estimation.GetStateVector(stateList, _vm.NodeList);
+                Matrix Fmeas = Estimation.GetMeasVector(_vm.OiList); //матрица измерений
+                var gn = new GaussNewton(U, Fmeas);
                 do
                 {
-                    Matrix U = Estimation.GetStateVector(stateList, _vm.NodeList);
-                    _vm.StateVectorList.Add(U);
-                    Matrix Fmeas = Estimation.GetMeasVector(_vm.OiList); //матрица измерений
-                    Matrix Fcalc =
-                        Estimation.GetCalcVector(stateList, _vm.NodeList, _vm.BranchList,
-                            _vm.OiList); //матрица рассчёта параметров режима
-                    Matrix F = Fcalc - Fmeas;
-                    Matrix J = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList,
-                        _vm.OiList); //матрица Якоби
-                    Matrix C = Estimation.GetWeightMatrix(J, _vm.OiList,
-                        _vm.GetRatioByJacobi); //матрица весовых коэффициентов*/	
-                    var maxF = Matrix.MaxElement(F);
-                    if (maxF < 1 && nomerIterac == 1)
+                    Matrix Fcalc = Estimation.GetCalcVector(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
+
+                    if (Fcalc.Equals(Fmeas))
                     {
                         _vm.Log($"Итерация №{nomerIterac} \n Целевая функция F=0 \n Погрешность e =0");
                         Estimation.GetAllOi(stateList, _vm.NodeList, _vm.BranchList);
+                        _vm.StateVectorList.Add(U);
                         break;
                     }
 
+                    Matrix J = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
+                    Matrix C = Estimation.GetWeightMatrix(J, _vm.OiList, _vm.GetRatioByJacobi);
                     try
                     {
-                        //Основной рачет
+                        var result = gn.Calculate(Fcalc, C, J);
 
-                        Matrix Ft = Matrix.Transpose(F);
-                        var f = Matrix.Multiply(0.5, Ft) * C * F;
-                        Matrix H = Matrix.Transpose(J) * C * J;
-                        Matrix grad = Matrix.Transpose(J) * C * F;
-                        Matrix deltaU = H.Invert() * (-grad);
-                        var error = Matrix.MaxElement(deltaU);
-                        U += Matrix.Multiply(1, deltaU);
-                        stateList = Estimation.UpdateState(U, stateList);
+                        var error = result.error;
+                        var f = result.target[0, 0];
 
-                        _vm.Log($"Итерация №{nomerIterac} \n Целевая функция F={f[0, 0]} \n Погрешность e ={error}");
+                        stateList = Estimation.UpdateState(gn.State, stateList);
+                        _vm.StateVectorList.Add(gn.State);
+
+                        _vm.Log($"Итерация №{nomerIterac} \n Целевая функция F={f} \n Погрешность e ={error}");
                         nomerIterac++;
-                        if ((error < _vm.MaxError) && (f[0, 0] < 3))
+                        if (error < _vm.MaxError && f < 3)
                         {
                             Estimation.GetAllOi(stateList, _vm.NodeList, _vm.BranchList);
                             break;

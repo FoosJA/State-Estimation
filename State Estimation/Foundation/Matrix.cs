@@ -650,6 +650,32 @@ namespace State_Estimation.Foundation
         {
             return Matrix.Multiply(n, m);
         }
+
+        public bool Equals(Matrix other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            if (!cols.Equals(other.cols) || !rows.Equals(other.rows))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < cols; i++)
+            {
+                for (int j = 0; j < rows; j++)
+                {
+                    if (!this[j, i].Equals(other[j, i]))
+                    {
+                        return false;
+                    }
+                }
+                
+            }
+
+            return true;
+        }
+        
     }
 
     public class MException : Exception

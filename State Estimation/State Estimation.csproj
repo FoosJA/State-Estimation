@@ -110,6 +110,7 @@
     <Compile Include="Command\SaveCommand.cs" />
     <Compile Include="Command\SettingsCommand.cs" />
     <Compile Include="Command\StaticStateEstimationCommand.cs" />
+    <Compile Include="Foundation\GaussNewton.cs" />
     <Compile Include="Foundation\KalmanFilter.cs" />
     <Compile Include="Foundation\RastrWinReader.cs" />
     <Compile Include="Infrastructure\MyEnumExtensions.cs" />
