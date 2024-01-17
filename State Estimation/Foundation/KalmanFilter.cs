@@ -25,15 +25,7 @@ namespace State_Estimation.Foundation
         /// </summary>
         public Matrix B { get; private set; }
 
-        /// <summary>
-        /// Матрица Якоби
-        /// </summary>
-        public Matrix J { get; private set; }
 
-        /// <summary>
-        /// Шум измерений
-        /// </summary>
-        public Matrix Q { get; private set; }
 
         /// <summary>
         /// Ковариация шума процесса
@@ -58,22 +50,13 @@ namespace State_Estimation.Foundation
         /// <param name="f">Матрица перехода</param>
         /// <param name="j">Матрица Якоби</param>
         /// <param name="c">Ковариация шума процесса</param>
-        public KalmanFilter(Matrix b, Matrix q, Matrix f, Matrix j, Matrix c)
-        {
-            B = b;
-            Q = q;
-            F = f;
-            J = j;
-            C = c;
-        }
-
-        /// <summary>
-        /// Задать текущее состояние
-        /// </summary>
         /// <param name="state"></param>
         /// <param name="covariance"></param>
-        public void SetState(Matrix state, Matrix covariance)
+        public KalmanFilter(Matrix b, Matrix c, Matrix f,  Matrix state, Matrix covariance)
         {
+            B = b;
+            C =c;
+            F = f;
             State = state;
             Covariance = covariance;
         }
@@ -82,13 +65,15 @@ namespace State_Estimation.Foundation
         /// Фильтрация
         /// </summary>
         /// <param name="measureMatrix"></param>
-        public void Correct(Matrix measureMatrix)
+        /// <param name="j"></param>
+        /// <param name="c"></param>
+        public void Correct(Matrix measureMatrix, Matrix j, Matrix q)
         {
             //measurement update - correction
-            var S = J * Covariance * Matrix.Transpose(J) + Q;
-            var K = Covariance * Matrix.Transpose(J) * S.Invert();
-            X0 = State + K * (measureMatrix - J * State);
-            P0 = (Matrix.IdentityMatrix(F.rows, F.cols) - K * J) * Covariance;
+            var S = j * Covariance * Matrix.Transpose(j) + q;
+            var K = Covariance * Matrix.Transpose(j) * S.Invert();
+            X0 = State + K * (measureMatrix - j * State);
+            P0 = (Matrix.IdentityMatrix(F.rows, F.cols) - K * j) * Covariance;
 
             //time update - prediction
             State = F * X0 + B;

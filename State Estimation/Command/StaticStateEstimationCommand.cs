@@ -46,47 +46,46 @@ namespace State_Estimation.Command
 
                 var nodeCount = _vm.NodeList.Count;
                 //кол-во компонентов вектора состояния
-                var K = 2 * nodeCount - 1;
+                var k = 2 * nodeCount - 1;
                 var measureCount = _vm.OiList.Count;
-                if (measureCount < K)
+                if (measureCount < k)
                 {
                     throw new ArgumentException("Режим ненаблюдаем!");
                 }
 
-                ///TODO: может когда-нибудь смогу это реализовать
+                //TODO: может когда-нибудь смогу это реализовать
                 //Matrix G = new Matrix(NodeList.Count, NodeList.Count);
                 //Matrix B = new Matrix(NodeList.Count, NodeList.Count);
 
-                foreach (var oi in
-                         _vm.OiList) //используется при старте рассчёта, чтобы обращаться к оценке измерения на каждой итерации
+                //используется при старте рассчёта, чтобы обращаться к оценке измерения на каждой итерации
+                foreach (var oi in _vm.OiList) 
                 {
                     oi.Estimation = oi.Measurement;
                 }
 
                 var nomerIterac = 1;
-                Matrix U = Estimation.GetStateVector(stateList, _vm.NodeList);
-                Matrix Fmeas = Estimation.GetMeasVector(_vm.OiList); //матрица измерений
-                var gn = new GaussNewton(U, Fmeas);
+                var stateVector = Estimation.GetStateVector(stateList, _vm.NodeList);
+                var measVector = Estimation.GetMeasVector(_vm.OiList);
+                var gn = new GaussNewton(stateVector, measVector);
                 do
                 {
-                    Matrix Fcalc = Estimation.GetCalcVector(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
+                    var calcVector = Estimation.GetCalcVector(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
 
-                    if (Fcalc.Equals(Fmeas))
+                    if (calcVector.Equals(measVector))
                     {
                         _vm.Log($"Итерация №{nomerIterac} \n Целевая функция F=0 \n Погрешность e =0");
                         Estimation.GetAllOi(stateList, _vm.NodeList, _vm.BranchList);
-                        _vm.StateVectorList.Add(U);
+                        _vm.StateVectorList.Add(stateVector);
                         break;
                     }
 
-                    Matrix J = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
-                    Matrix C = Estimation.GetWeightMatrix(J, _vm.OiList, _vm.GetRatioByJacobi);
+                    var jacobian = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
+                    var weightMatrix = Estimation.GetWeightMatrix(jacobian, _vm.OiList, _vm.GetRatioByJacobi);
                     try
                     {
-                        var result = gn.Calculate(Fcalc, C, J);
+                        var (target, error) = gn.Calculate(calcVector, weightMatrix, jacobian);
 
-                        var error = result.error;
-                        var f = result.target[0, 0];
+                        var f = target[0, 0];
 
                         stateList = Estimation.UpdateState(gn.State, stateList);
                         _vm.StateVectorList.Add(gn.State);

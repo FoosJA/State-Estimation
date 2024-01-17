@@ -4,19 +4,30 @@ using System.Windows.Input;
 using State_Estimation.Model;
 using System.Collections.ObjectModel;
 using State_Estimation.Foundation;
+using Xunit.Abstractions;
 
 namespace Tests
 {
     public class LogicTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public LogicTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
+        /// <summary>
+        /// –°—Ç–∞—Ç–∏—á–µ—Å–∫–æ–µ –û–° –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π —Å—Ö–µ–º—ã
+        /// </summary>
         [Fact]
-        public void SSEThreeNodes()
+        public void SseThreeNodes()
         {
             var vm = new AppViewModel();
 
-            var node1 = new Node(true, 1, TypeNode.Gen, "ÛÁÂÎ 1", 110, 0);
-            var node2 = new Node(true, 2, TypeNode.Load, "ÛÁÂÎ 2", 110, 0);
-            var node3 = new Node(true, 3, TypeNode.Base, "ÛÁÂÎ 3", 115, 0);
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "—É–∑–µ–ª 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "—É–∑–µ–ª 3", 115, 0);
             vm.NodeList = new ObservableCollection<Node>
             {
                 node3,
@@ -24,9 +35,9 @@ namespace Tests
                 node2
             };
 
-            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "‚ÂÚ‚¸ 1-2", 10, 25, 0, 0, 1);
-            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "‚ÂÚ‚¸ 3-1", 10, 20, 0, 0, 1);
-            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "‚ÂÚ‚¸ 3-2", 15, 30, 0, 0, 1);
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "–≤–µ—Ç–≤—å 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "–≤–µ—Ç–≤—å 3-2", 15, 30, 0, 0, 1);
             vm.BranchList = new ObservableCollection<Branch>
             {
                 branch1,
@@ -63,24 +74,27 @@ namespace Tests
             command.Execute(null);
 
             var stateVector = vm.StateVectorList.Last();
-            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
 
             var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
             Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Pij");
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Pij");
             Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Qij");
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Qij");
         }
 
+        /// <summary>
+        /// –ü—Ä–æ–≤–µ—Ä–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ –ø–∞—Ä–∞–º–µ—Ç—Ä–æ–≤ —Å—Ö–µ–º—ã –ø–æ –≤–µ–∫—Ç–æ—Ä—É —Å–æ—Å—Ç–æ—è–Ω–∏—è
+        /// </summary>
         [Fact]
         public void GetAllOiTest()
         {
-            var node1 = new Node(true, 1, TypeNode.Gen, "ÛÁÂÎ 1", 110, 0);
-            var node2 = new Node(true, 2, TypeNode.Base, "ÛÁÂÎ 2", 115, 0);
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Base, "—É–∑–µ–ª 2", 115, 0);
             var nodeList = new ObservableCollection<Node>
             {
                 node1,
@@ -93,24 +107,116 @@ namespace Tests
                 new() { Node = node2, Delta = 0, U = 115 }
             };
 
-            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "‚ÂÚ‚¸ 1-2", 10, 10, 0, 0, 1);
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 10, 0, 0, 1);
             var branchList = new ObservableCollection<Branch> { branch1 };
 
             Estimation.GetAllOi(stateList, nodeList, branchList);
 
-            Assert.True(Math.Abs(node1.P.Estimation + 99.764) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Pi ÔÓ U");
-            Assert.True(Math.Abs(node1.Q.Estimation + 49.88205) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Qi ÔÓ U");
+            Assert.True(Math.Abs(node1.P.Estimation + 99.764) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Pi –ø–æ U");
+            Assert.True(Math.Abs(node1.Q.Estimation + 49.88205) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Qi –ø–æ U");
 
-            Assert.True(Math.Abs(branch1.Pj.Estimation - 112.227) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Pij ÔÓ U");
-            Assert.True(Math.Abs(branch1.Qj.Estimation - 62.345) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Qij ÔÓ U");
-            Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 644.528) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Iij ÔÓ U");
+            Assert.True(Math.Abs(branch1.Pj.Estimation - 112.227) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Pij –ø–æ U");
+            Assert.True(Math.Abs(branch1.Qj.Estimation - 62.345) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Qij –ø–æ U");
+            Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 644.528) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Iij –ø–æ U");
         }
 
+        /// <summary>
+        /// –†–∞—Å—á–µ—Ç –ø–∞—Ä–∞–º–µ—Ç—Ä–æ–≤ –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π –∫–æ–ª—å—Ü–µ–≤–æ–π —Å—Ö–µ–º—ã –¥–ª—è —Å—Ç–∞—Ç—å–∏
+        /// </summary>
+        [Fact]
+        public void ForPaperRing()
+        {
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "—É–∑–µ–ª 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "—É–∑–µ–ª 3", 115, 0);
+            var nodeList = new ObservableCollection<Node>
+            {
+                node3,
+                node1,
+                node2
+            };
+
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "–≤–µ—Ç–≤—å 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "–≤–µ—Ç–≤—å 3-2", 15, 30, 0, 0, 1);
+            var branchList = new ObservableCollection<Branch>
+            {
+                branch1,
+                branch2,
+                branch3
+            };
+
+            var stateList = new List<State>
+            {
+                new() { Node = node1, Delta = 0.00077, U = 116.007 },
+                new() { Node = node2, Delta = -3.432, U = 110.736 },
+                new() { Node = node3, Delta = 0, U = 115 },
+            };
+
+            Estimation.GetAllOi(stateList, nodeList, branchList);
+            _testOutputHelper.WriteLine($"P1={node1.P.Estimation};Q1={node1.Q.Estimation}");
+            _testOutputHelper.WriteLine($"P2={node2.P.Estimation};Q2={node2.Q.Estimation}");
+            _testOutputHelper.WriteLine($"P3={node3.P.Estimation};Q3={node3.Q.Estimation}");
+            _testOutputHelper.WriteLine($"P12={branch1.Pi.Estimation};Q12={branch1.Qi.Estimation}");
+            _testOutputHelper.WriteLine($"P21={branch1.Pj.Estimation};Q21={branch1.Qj.Estimation}");
+
+            _testOutputHelper.WriteLine($"P13={branch3.Pj.Estimation};Q13={branch3.Qj.Estimation}");
+            _testOutputHelper.WriteLine($"P31={branch3.Pi.Estimation};Q33={branch3.Qi.Estimation}");
+
+            _testOutputHelper.WriteLine($"P23={branch2.Pj.Estimation};Q23={branch2.Qj.Estimation}");
+            _testOutputHelper.WriteLine($"P32={branch2.Pi.Estimation};Q32={branch2.Qi.Estimation}");
+        }
+
+        /// <summary>
+        /// –†–∞—Å—á–µ—Ç –ø–∞—Ä–∞–º–µ—Ç—Ä–æ–≤ –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π —Ä–∞–¥–∏–∞–ª—å–Ω–æ–π —Å—Ö–µ–º—ã –¥–ª—è —Å—Ç–∞—Ç—å–∏
+        /// </summary>
+        [Fact]
+        public void ForPaperRadial()
+        {
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "—É–∑–µ–ª 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "—É–∑–µ–ª 3", 115, 0);
+            var nodeList = new ObservableCollection<Node>
+            {
+                node3,
+                node1,
+                node2
+            };
+
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 25, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "–≤–µ—Ç–≤—å 3-2", 15, 30, 0, 0, 1);
+            var branchList = new ObservableCollection<Branch>
+            {
+                branch1,
+                branch3
+            };
+
+            var stateList = new List<State>
+            {
+                new() { Node = node1, Delta = 4.778, U = 120.7 },
+                new() { Node = node2, Delta = 3.454, U = 114.374 },
+                new() { Node = node3, Delta = 0, U = 111.737 },
+            };
+
+            Estimation.GetAllOi(stateList, nodeList, branchList);
+            _testOutputHelper.WriteLine($"P1={node1.P.Estimation};Q1={node1.Q.Estimation}");
+            _testOutputHelper.WriteLine($"P2={node2.P.Estimation};Q2={node2.Q.Estimation}");
+            _testOutputHelper.WriteLine($"P3={node3.P.Estimation};Q3={node3.Q.Estimation}");
+            _testOutputHelper.WriteLine($"P12={branch1.Pi.Estimation};Q12={branch1.Qi.Estimation}");
+            _testOutputHelper.WriteLine($"P21={branch1.Pj.Estimation};Q21={branch1.Qj.Estimation}");
+
+            _testOutputHelper.WriteLine($"P13={branch3.Pj.Estimation};Q13={branch3.Qj.Estimation}");
+            _testOutputHelper.WriteLine($"P31={branch3.Pi.Estimation};Q33={branch3.Qi.Estimation}");
+        }
+
+        /// <summary>
+        /// –ü—Ä–æ–≤–µ—Ä–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ —Å—Ö–µ–º—ã –∑–∞–º–µ—â–µ–Ω–∏—è –õ–≠–ü
+        /// </summary>
         [Fact]
         public void GetOiLineTest()
         {
-            var node1 = new Node(true, 1, TypeNode.Gen, "ÛÁÂÎ 1", 110, 0);
-            var node2 = new Node(true, 2, TypeNode.Base, "ÛÁÂÎ 2", 115, 0);
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Base, "—É–∑–µ–ª 2", 115, 0);
             var nodeList = new ObservableCollection<Node>
             {
                 node1,
@@ -123,27 +229,32 @@ namespace Tests
                 new() { Node = node2, Delta = 0, U = 115 }
             };
 
-            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "‚ÂÚ‚¸ 1-2", 10, 10, 1200, 800, 1);
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 10, 1200, 800, 1);
             var branchList = new ObservableCollection<Branch> { branch1 };
 
             Estimation.GetAllOi(stateList, nodeList, branchList);
 
-            Assert.True(Math.Abs(node1.P.Estimation + 99.731) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Pi ÔÓ U");
-            Assert.True(Math.Abs(node1.Q.Estimation + 49.866) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Qi ÔÓ U");
+            Assert.True(Math.Abs(node1.P.Estimation + 99.731) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Pi –ø–æ U");
+            Assert.True(Math.Abs(node1.Q.Estimation + 49.866) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Qi –ø–æ U");
 
-            Assert.True(Math.Abs(branch1.Pj.Estimation - 123.116) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Pij ÔÓ U");
-            Assert.True(Math.Abs(branch1.Qj.Estimation - 77.846) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Qij ÔÓ U");
-            Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 731.29) < 0.1, "ÕÂÍÓÂÍÚÌ˚È ‡Ò˜ÂÚ Iij ÔÓ U");
+            Assert.True(Math.Abs(branch1.Pj.Estimation - 123.116) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Pij –ø–æ U");
+            Assert.True(Math.Abs(branch1.Qj.Estimation - 77.846) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Qij –ø–æ U");
+            Assert.True(Math.Abs(branch1.Ij.Estimation * 1000 - 731.29) < 0.1, "–ù–µ–∫–æ—Ä—Ä–µ–∫—Ç–Ω—ã–π —Ä–∞—Å—á–µ—Ç Iij –ø–æ U");
         }
 
+        /// <summary>
+        /// –ü—Ä–æ—Å—Ç–æ–π –§–õ 2—Ö –º–µ—Ä–Ω—ã–π
+        /// </summary>
         [Fact]
         public void SimpleKalman2D()
         {
             var measurements = new List<Matrix>();
             for (var i = 0; i < 3; i++)
             {
-                var item = new Matrix(1, 1);
-                item[0, 0] = i + 1;
+                var item = new Matrix(1, 1)
+                {
+                    [0, 0] = i + 1
+                };
                 measurements.Add(item);
             }
 
@@ -151,71 +262,85 @@ namespace Tests
             const int col = 2;
             const int m = 1;
 
-            var f = new Matrix(k, k);
-            f[0, 0] = 1;
-            f[0, 1] = 1;
-            f[1, 0] = 0;
-            f[1, 1] = 1;
+            var f = new Matrix(k, k)
+            {
+                [0, 0] = 1,
+                [0, 1] = 1,
+                [1, 0] = 0,
+                [1, 1] = 1
+            };
 
-            var j = new Matrix(m, k);
-            j[0, 0] = 1;
-            j[0, 1] = 0;
+            var j = new Matrix(m, k)
+            {
+                [0, 0] = 1,
+                [0, 1] = 0
+            };
 
-            var q = new Matrix(m, m);
-            q[0, 0] = 1;
+            var q = new Matrix(m, m)
+            {
+                [0, 0] = 1
+            };
 
-            var b = new Matrix(k, 1);
-            b[0, 0] = 0;
-            b[1, 0] = 0;
+            var b = new Matrix(k, 1)
+            {
+                [0, 0] = 0,
+                [1, 0] = 0
+            };
 
-            var c = new Matrix(k, col);
-            c[0, 0] = 0;
-            c[0, 1] = 0;
-            c[1, 0] = 0;
-            c[1, 1] = 0;
+            var c = new Matrix(k, col)
+            {
+                [0, 0] = 0,
+                [0, 1] = 0,
+                [1, 0] = 0,
+                [1, 1] = 0
+            };
 
-            var kalman = new KalmanFilter(b, q, f, j, c);
+            var x = new Matrix(k, 1)
+            {
+                [0, 0] = 0,
+                [1, 0] = 0
+            };
 
-            var x = new Matrix(k, 1);
-            x[0, 0] = 0;
-            x[1, 0] = 0;
+            var p = new Matrix(k, col)
+            {
+                [0, 0] = 1000,
+                [0, 1] = 0,
+                [1, 0] = 0,
+                [1, 1] = 1000
+            };
 
-            var p = new Matrix(k, col);
-            p[0, 0] = 1000;
-            p[0, 1] = 0;
-            p[1, 0] = 0;
-            p[1, 1] = 1000;
-
-            // «‡‰‡ÂÏ Ì‡˜‡Î¸Ì˚Â ÁÌ‡˜ÂÌËÂ State Ë Covariance
-            kalman.SetState(x, p);
-
+            // –ó–∞–¥–∞–µ–º –Ω–∞—á–∞–ª—å–Ω—ã–µ –∑–Ω–∞—á–µ–Ω–∏–µ State –∏ Covariance
+            var kalman = new KalmanFilter(b, c, f, x, p);
             foreach (var measureMatrix in measurements)
             {
-                kalman.Correct(measureMatrix);
+                kalman.Correct(measureMatrix, j, q);
             }
 
             var state = kalman.State;
             var covariance = kalman.Covariance;
             Assert.True(Math.Abs(state[0, 0] - 3.9996) < 0.01 && Math.Abs(state[1, 0] - 0.9999) < 0.01,
-                "‚ÂÍÚÓ ÒÓÒÚÓˇÌËˇ ÌÂ ÒÓ‚Ô‡‰‡ÂÚ Ò ÂÁÛÎ¸Ú‡ÚÓÏ");
+                "–≤–µ–∫—Ç–æ—Ä —Å–æ—Å—Ç–æ—è–Ω–∏—è –Ω–µ —Å–æ–≤–ø–∞–¥–∞–µ—Ç —Å —Ä–µ–∑—É–ª—å—Ç–∞—Ç–æ–º");
 
             Assert.True(Math.Abs(covariance[0, 0] - 2.331) < 0.01 && Math.Abs(covariance[0, 1] - 0.99916) < 0.01
                                                                   && Math.Abs(covariance[1, 0] - 0.999167) < 0.01 &&
                                                                   Math.Abs(covariance[1, 1] - 0.4995) < 0.01,
-                "ÍÓ‚‡Ë‡ˆËˇ ÌÂ ÒÓ‚Ô‡‰‡ÂÚ Ò ÂÁÛÎ¸Ú‡ÚÓÏ");
+                "–∫–æ–≤–∞—Ä–∏–∞—Ü–∏—è –Ω–µ —Å–æ–≤–ø–∞–¥–∞–µ—Ç —Å —Ä–µ–∑—É–ª—å—Ç–∞—Ç–æ–º");
         }
 
 
+        /// <summary>
+        /// –î–∏–Ω–û–° –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π —Å—Ö–µ–º—ã
+        /// </summary>
         [Fact]
-        public void DSEThreeNodes()
+        public void DseThreeNodes()
         {
             var vm = new AppViewModel();
 
-            #region ÔÓ‰„ÓÚÓ‚Í‡ ÒıÂÏ˚
+            #region –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∞ —Å—Ö–µ–º—ã
 
-            var node1 = new Node(true, 1, TypeNode.Gen, "ÛÁÂÎ 1", 110, 0);
-            var node2 = new Node(true, 2, TypeNode.Load, "ÛÁÂÎ 2", 110, 0);
-            var node3 = new Node(true, 3, TypeNode.Base, "ÛÁÂÎ 3", 115, 0);
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "—É–∑–µ–ª 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "—É–∑–µ–ª 3", 115, 0);
             vm.NodeList = new ObservableCollection<Node>
             {
                 node3,
@@ -223,9 +348,9 @@ namespace Tests
                 node2
             };
 
-            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "‚ÂÚ‚¸ 1-2", 10, 25, 0, 0, 1);
-            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "‚ÂÚ‚¸ 3-1", 10, 20, 0, 0, 1);
-            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "‚ÂÚ‚¸ 3-2", 15, 30, 0, 0, 1);
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "–≤–µ—Ç–≤—å 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "–≤–µ—Ç–≤—å 3-2", 15, 30, 0, 0, 1);
             vm.BranchList = new ObservableCollection<Branch>
             {
                 branch1,
@@ -235,7 +360,7 @@ namespace Tests
 
             #endregion
 
-            #region ÔÓ‰„ÓÚÓ‚Í‡ Œ»
+            #region –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∞ –û–ò
 
             var p1 = new OperationInfo() { NodeNumb = 1, Type = OperationInfo.KeyType.P, Measurement = 30 };
             var q1 = new OperationInfo() { NodeNumb = 1, Type = OperationInfo.KeyType.Q, Measurement = 19 };
@@ -269,74 +394,110 @@ namespace Tests
             command.Execute(null);
 
             var stateVector = vm.StateVectorList.Last();
-            //TODO: Ú‡Í Ë ÌÂ ÔÓÎÛ˜ËÎÓÒ¸ ‰Ó·ËÚ¸Òˇ Ó‰ËÌ‡ÍÓ‚˚ı ÂÁÛÎ¸Ú‡ÚÓ‚ Ò ÙËÎ¸ÚÓÏ Í‡ÎÏ‡Ì‡
-            //ÚÛÚ ÔË q=ÔÓ ‚ÂÒÓ‚˚Ï, c=0.02*0.02, p=0 6 ËÚÂ‡ˆËÈ
-            Assert.True(Math.Abs(stateVector[0, 0] - 115.642) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[1, 0] - 0.0473) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[2, 0] - 109.5455) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[3, 0] + 2.5036) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[4, 0] - 109.6079) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
+
+            //—Ç—É—Ç –ø—Ä–∏ q=–ø–æ –≤–µ—Å–æ–≤—ã–º, c=1, p=0 2 –∏—Ç–µ—Ä–∞—Ü–∏–π
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.886) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.0473) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.786) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.503) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 110.798) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
 
             var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
-            Assert.True(Math.Abs(resultNode2.P.Estimation + 42.407) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Pij");
-            Assert.True(Math.Abs(resultNode2.Q.Estimation + 7.703) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Qij");
+            Assert.True(Math.Abs(resultNode2.P.Estimation + 43.407) < 0.8,
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Pij");
+            Assert.True(Math.Abs(resultNode2.Q.Estimation + 7.703) < 0.8,
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Qij");
         }
 
+        /// <summary>
+        /// –°—Ç–∞—Ç–û–° –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π —Å—Ö–µ–º—ã —Ç–æ–ª—å–∫–æ –ø–æ –¢–ò –Ω–∞–ø—Ä—è–∂–µ–Ω–∏—è
+        /// </summary>
         [Fact]
         public void SSEThreeNodesByOnlyVoltage()
         {
             var vm = new AppViewModel();
-            CreateModel(vm);
+            CreateModelByVoltage(vm);
 
             ICommand command = new StaticStateEstimationCommand(vm);
             command.Execute(null);
 
             var stateVector = vm.StateVectorList.Last();
-            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
 
             var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
             Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Pij");
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Pij");
             Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Qij");
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Qij");
         }
 
+        /// <summary>
+        /// –°—Ç–∞—Ç–û–° –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π —Å—Ö–µ–º—ã —Ç–æ–ª—å–∫–æ –ø–æ –¢–ò –Ω–∞–≥—Ä—É–∑–∫–∏
+        /// </summary>
+        [Fact]
+        public void SSEThreeNodesByOnlyLoad()
+        {
+            var vm = new AppViewModel();
+            CreateModelByLoad(vm);
+
+            ICommand command = new StaticStateEstimationCommand(vm);
+            command.Execute(null);
+
+            var stateVector = vm.StateVectorList.Last();
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+
+            var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
+            Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Pij");
+            Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Qij");
+        }
+
+        /// <summary>
+        /// –î–∏–Ω–û–° –¥–ª—è 3—Ö —É–∑–ª–æ–≤–æ–π —Å—Ö–µ–º—ã —Ç–æ–ª—å–∫–æ–ø–æ –¢–ò –Ω–∞–ø—Ä—è–∂–µ–Ω–∏—è
+        /// </summary>
         [Fact]
         public void DSEThreeNodesByOnlyVoltage()
         {
             var vm = new AppViewModel();
-            CreateModel(vm);
+            CreateModelByVoltage(vm);
 
             ICommand command = new DynamicStateEstimationCommand(vm);
             command.Execute(null);
 
             var stateVector = vm.StateVectorList.Last();
-            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
-            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ U");
+            Assert.True(Math.Abs(stateVector[0, 0] - 116.007) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[1, 0] - 0.000746) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[2, 0] - 110.73679) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[3, 0] + 2.43292) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
+            Assert.True(Math.Abs(stateVector[4, 0] - 114.99987) < 0.1, "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ U");
 
             var resultNode2 = vm.NodeList.First(x => x.Numb == 2);
             Assert.True(Math.Abs(resultNode2.P.Estimation + 47.257) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Pij");
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Pij");
             Assert.True(Math.Abs(resultNode2.Q.Estimation + 17.276) < 0.1,
-                "3ı ÛÁÎÓ‚‡ˇ ÒıÂÏ‡ ÒÚ‡ÚŒÒ: Ó¯Ë·Í‡ ‡Ò˜ÂÚ‡ Qij");
+                "3—Ö —É–∑–ª–æ–≤–∞—è —Å—Ö–µ–º–∞ —Å—Ç–∞—Ç–û—Å: –æ—à–∏–±–∫–∞ —Ä–∞—Å—á–µ—Ç–∞ Qij");
         }
 
-        private void CreateModel(AppViewModel vm)
+        /// <summary>
+        /// –°–æ–∑–¥–∞—Ç—å 3—Ö —É–∑–ª–æ–≤—É—é —Å—Ö–µ–º—É —Å –¢–ú –ø–æ –Ω–∞–ø—Ä—è–∂–µ–Ω–∏—é
+        /// </summary>
+        /// <param name="vm"></param>
+        private static void CreateModelByVoltage(AppViewModel vm)
         {
-            #region ÔÓ‰„ÓÚÓ‚Í‡ ÒıÂÏ˚
+            #region –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∞ —Å—Ö–µ–º—ã
 
-            var node1 = new Node(true, 1, TypeNode.Gen, "ÛÁÂÎ 1", 110, 0);
-            var node2 = new Node(true, 2, TypeNode.Load, "ÛÁÂÎ 2", 110, 0);
-            var node3 = new Node(true, 3, TypeNode.Base, "ÛÁÂÎ 3", 115, 0);
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "—É–∑–µ–ª 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "—É–∑–µ–ª 3", 115, 0);
             vm.NodeList = new ObservableCollection<Node>
             {
                 node3,
@@ -344,9 +505,9 @@ namespace Tests
                 node2
             };
 
-            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "‚ÂÚ‚¸ 1-2", 10, 25, 0, 0, 1);
-            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "‚ÂÚ‚¸ 3-1", 10, 20, 0, 0, 1);
-            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "‚ÂÚ‚¸ 3-2", 15, 30, 0, 0, 1);
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "–≤–µ—Ç–≤—å 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "–≤–µ—Ç–≤—å 3-2", 15, 30, 0, 0, 1);
             vm.BranchList = new ObservableCollection<Branch>
             {
                 branch1,
@@ -356,7 +517,7 @@ namespace Tests
 
             #endregion
 
-            #region ÔÓ‰„ÓÚÓ‚Í‡ Œ»
+            #region –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∞ –û–ò
 
             var u1 = new OperationInfo()
                 { NodeNumb = 1, Type = OperationInfo.KeyType.U, Measurement = 116.007 };
@@ -380,6 +541,67 @@ namespace Tests
                 delta2,
                 u3,
                 delta3,
+            };
+
+            #endregion
+        }
+
+        /// <summary>
+        /// –°–æ–∑–¥–∞—Ç—å 3—Ö —É–∑–ª–æ–≤—É—é —Å—Ö–µ–º—É —Å –¢–ú –ø–æ –Ω–∞–≥—Ä—É–∑–∫–µ
+        /// </summary>
+        /// <param name="vm"></param>
+        private static void CreateModelByLoad(AppViewModel vm)
+        {
+            #region –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∞ —Å—Ö–µ–º—ã
+
+            var node1 = new Node(true, 1, TypeNode.Gen, "—É–∑–µ–ª 1", 110, 0);
+            var node2 = new Node(true, 2, TypeNode.Load, "—É–∑–µ–ª 2", 110, 0);
+            var node3 = new Node(true, 3, TypeNode.Base, "—É–∑–µ–ª 3", 115, 0);
+            vm.NodeList = new ObservableCollection<Node>
+            {
+                node3,
+                node1,
+                node2
+            };
+
+            var branch1 = new Branch(true, 1, TypeBranch.Line, 1, 2, 1, "–≤–µ—Ç–≤—å 1-2", 10, 25, 0, 0, 1);
+            var branch2 = new Branch(true, 2, TypeBranch.Line, 3, 1, 1, "–≤–µ—Ç–≤—å 3-1", 10, 20, 0, 0, 1);
+            var branch3 = new Branch(true, 3, TypeBranch.Line, 3, 2, 1, "–≤–µ—Ç–≤—å 3-2", 15, 30, 0, 0, 1);
+            vm.BranchList = new ObservableCollection<Branch>
+            {
+                branch1,
+                branch2,
+                branch3
+            };
+
+            #endregion
+
+            #region –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∞ –û–ò
+
+            var p1 = new OperationInfo()
+                { NodeNumb = 1, Type = OperationInfo.KeyType.P, Measurement = 29.746 };
+            var q1 = new OperationInfo()
+                { NodeNumb = 1, Type = OperationInfo.KeyType.Q, Measurement = 18.627 };
+            var p2 = new OperationInfo()
+                { NodeNumb = 2, Type = OperationInfo.KeyType.P, Measurement = -47.256 };
+            var q2 = new OperationInfo()
+                { NodeNumb = 2, Type = OperationInfo.KeyType.Q, Measurement = -17.27 };
+            var p3 = new OperationInfo()
+                { NodeNumb = 3, Type = OperationInfo.KeyType.P, Measurement = 18.782 };
+            var q3 = new OperationInfo()
+                { NodeNumb = 3, Type = OperationInfo.KeyType.Q, Measurement = 1.542 };
+
+            var u3 = new OperationInfo()
+                { NodeNumb = 3, Type = OperationInfo.KeyType.U, Measurement = 114.99987 };
+            vm.OiList = new ObservableCollection<OperationInfo>
+            {
+                p1,
+                q1,
+                p2,
+                q2,
+                p3,
+                q3,
+                u3
             };
 
             #endregion

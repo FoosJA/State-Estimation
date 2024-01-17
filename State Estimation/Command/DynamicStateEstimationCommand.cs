@@ -27,52 +27,56 @@ namespace State_Estimation.Command
 
             var nodeCount = _vm.NodeList.Count;
             //кол-во компонентов вектора состояния
-            var K = 2 * nodeCount - 1;
+            var k = 2 * nodeCount - 1;
             var measureCount = _vm.OiList.Count;
-            if (measureCount < K)
+            if (measureCount < k)
             {
                 throw new ArgumentException("Режим ненаблюдаем!");
             }
 
-            ///TODO: может когда-нибудь смогу это реализовать
+            //TODO: может когда-нибудь смогу это реализовать
             //Matrix G = new Matrix(NodeList.Count, NodeList.Count);
             //Matrix B = new Matrix(NodeList.Count, NodeList.Count);
 
-            foreach (var oi in
-                     _vm.OiList) //используется при старте рассчёта, чтобы обращаться к оценке измерения на каждой итерации
+            //используется при старте рассчёта, чтобы обращаться к оценке измерения на каждой итерации
+            foreach (var oi in _vm.OiList)
             {
                 oi.Estimation = oi.Measurement;
             }
 
-            Matrix U = Estimation.GetStateVector(stateList, _vm.NodeList); //вектор состояния
-            Matrix J = Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList); //матрица Якоби
+            var stateVector = Estimation.GetStateVector(stateList, _vm.NodeList); //вектор состояния
 
-            var b = Matrix.ZeroMatrix(K, 1); // УВ нет поэтому 0
-            var q = Estimation.GetWeightMatrix(J, _vm.OiList, _vm.GetRatioByJacobi); //матрица весовых коэффициентов
-            var f = Matrix.IdentityMatrix(K, K);
+            var b = Matrix.ZeroMatrix(k, 1); // УВ нет поэтому 0
 
-            var c = Matrix.DiagonalMatrix(K, K, 0.02 * 0.02);
-            var p = Matrix.ZeroMatrix(K, K);//Квадратная матрица, порядок матрицы равен размеру вектора состояния
+            var f = Matrix.IdentityMatrix(k, k);
 
+            var c = Matrix.DiagonalMatrix(k, k, 1 /*0.02 * 0.02*/);
+            
+            //Квадратная матрица, порядок матрицы равен размеру вектора состояния
+            var p = Matrix.ZeroMatrix(k, k); 
 
-            var kalman = new KalmanFilter(b, q, f, J, c);
-            kalman.SetState(U, p);
+            var kalman = new KalmanFilter(b, c, f, stateVector, p);
 
-            Matrix F = Estimation.GetMeasVector(_vm.OiList); //матрица измерений
-            var measure = new List<Matrix>();
-            measure.Add(F);
-            measure.Add(F);
-            measure.Add(F);
-            measure.Add(F);
-            measure.Add(F);
-            measure.Add(F);
+            var measVector = Estimation.GetMeasVector(_vm.OiList);
+            var measure = new List<Matrix>
+            {
+                measVector,
+                measVector
+            };
+            
             foreach (var meas in measure)
             {
-                kalman.Correct(meas);
+                var jacobian =
+                    Estimation.GetJacobian(stateList, _vm.NodeList, _vm.BranchList, _vm.OiList);
+                var weightMatrix = //Matrix.DiagonalMatrix(measureCount, measureCount, 1);
+                    Estimation.GetWeightMatrix(jacobian, _vm.OiList,
+                        _vm.GetRatioByJacobi); //матрица весовых коэффициентов
+                kalman.Correct(meas, jacobian, weightMatrix);
+                stateList = Estimation.UpdateState(kalman.State, stateList);
                 _vm.StateVectorList.Add(kalman.State);
             }
 
-            stateList = Estimation.UpdateState(kalman.State, stateList);
+
             Estimation.GetAllOi(stateList, _vm.NodeList, _vm.BranchList);
         }
 
